@@ -1,0 +1,175 @@
+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
+git clone https://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@github.com/tejaswini29598/java_dsa
+Minimum one branch is created when we create a repository
+steps and commands:
+place a document file in the java_dsa folder
+here i placed Notes.txt
+1. ask the git to list down all the files that nedd to be pushed(uploaded)
+
+$git add path
+$git add C:/learning/java_dsa
+$git add .
+
+2. push (upload)
+$ git push origin main
+$ git push (Always pushes to main branch)
+
+3. Ask the git to create a secured object in which all the files to pushed are copied
+$git commit -m "java dsa notes added"
+
+To check the status of the repository
+$ git status
+
+now open the java_dsa in vs code
+
+To create project in eclipse:
+file -> new -> project -> java Project
+in the dialogue box (new window)
+de-select the module.java check box
+enter the project name(practice) and click finish
+
+now in explorer, expand the project folder
+now right click  src folder -> create -> new -> package
+give the package name "day1"
+
+right click  "day1" in explorer (under src folder), create -> class
+class name "HelloWorld" 
+
+Primitives types in java
+    Numeric:
+	  number only
+		byte
+		short
+		int 
+		long
+	  number with precision/ accuracy
+	  float
+	  double
+	Char
+    Boolean	
+ARITHMETIC OPERATORS:
++ - * / %
+
+// 11/06/25 //
+
+All the operators take 2 operands/inputs
+Hence, All are binary operators
+The expression is written using "INFIX" notation
+55 + 5
+inputs are numbers
+output is also a number
+5+8/9 The division must be evaluated first because of the BODMAS rule
+All arithmetic operators hava left to right associtivity
+The "INFIX" expression is what we uses but it will be first converted to "POSTFIX" expression and only then it will get evaluated
+
+int num=45;
+00000000 00000000 00000000 00101101 //It is decimal to binary conversion how the 45 number is stored in memory
+
+int num= -45;
+00101101 // it is the binary value of the 45
+11010010 // 1's compliment
+11010011 // 2's compliment
+now -1 * 2(7) + 1* 2(6) + 1 * 2(4) + 3
+-128+64+16+3
+-64+19
+-45
+
+float num = 5.5; // it is considered as double
+therefore float num =5.5f; // considered as float
+
+C++ inherited C
+
+sum = 5 + 5.5;
+when the expression has different types of values , then the lower type value will be changed to higher type
+this is because the data must not be lost
+-----------------------------------------------------------------------
+
+Relational Operators:
+> < >= <= != == 
+input has numbers
+output is Boolean
+All are binary operators
+used with infix notation
+has lesser precedence than arithmetic operators
+has higher precedence than logical operators
+
+for i from 1 to n do:
+for(int i=1;i<=n;i++)
+  or for(int i=1;i<n+1;i++)
+
+(10,40) //closed interval from 10 to 40
+(20,30) //open interval from 21 to 29
+(35,65) //right open interval from 35 to 64
+
+//assembly language is stored in .esm
+
+i=10;
+j=5;
+i++; j--;
+a[i] =b[j];
+b[j]--;
+
+i=10;
+j=5;
+a[++i] =b[--j]--;
+---------------------------------------------------------
+
+logical operators
+& &&  | || !
+input has boolean 
+output is Boolean
+All are binary operators except !
+used with infix notation
+has lesser precedence than arithmetic operators and relational operators
+has higher precedence than assignment operators
+
+All the programming files are stored in secondary memory(disk)
+files are loaded using "MACROS"(preprocessive directives (#include))
+.(dot operator) //left to right associtivity
+object.field 
+--------------------------------------------------------
+java program structure  SUN Microsystems (Standford University Network Microsystems)
+oops: abstraction,polymorphism,inheritance,encapsulation
+Disadvantages of C++:-
+1.main() must be global function
+2.global functions were allowed, thus the solutions(apps,software) created with neither procedural or object oriented
+3.global variables are still allowed in C++
+4.files are loaded using macros and stored till end of the program
+5.pointers are always a mess to many programmers
+6.The onus(responsibility) of creating and deleting objects in the heap is on programmer
+7.the inheritance is by default private which makes the accessing the inherited properties is very difficult. In java it is public inheritance
+8.Multiple inheritance creates a solution which is low cohensive
+9.The operator overloading concept can be used to just Implementanything which is necessary
+10.The compiler created object file which is environment(OS) restircted/dependent/specific.
+11.Handling run time errors is difficult
+12.objects can be created in stach area as well
+
+In java:(The Disadvantages of C++ have the solution in Java)
+1.No global functions, All are only methods (methods vs functions)
+Strict object oriented solution.Therefore no concept of global variables
+2.signed and unsigned removed thus the primitive datatypes are simplified.
+3.libraries can be loaded and used dynamically(no pre process)
+4.pointers are abstracted and users are given references.
+5.All objects are created in heap only
+6.array is an object in java
+7.creating object is the only job the programmer does. object deletion is automated with the concept of GARBAGE COLLECTION.
+8.the inheritance is by default public thus doesnot make implementation very easy
+9.no multiple inheritance
+10.all classes are always high cohensive
+11.the only operator can be overloaded is + and only for string concatenation
+12.The complier creates a byte code which is environment(OS) independent
+13.handling runtime errors is easy via exception handling
+14.friend concept is removed thus no more ambiguity and complexity in classes
+-----------------------------------------------------------------------------------
+Different stages of a program
+C++ is fast than java during runtime and python is the slowest among all
+The code area has the bytecode i.e .class files
+static/class vars are stored in GDS
+local vars and function parameters ,return address and method address(linkage) are stored in stack area
+all objects are stored in heap(dynamically allocated memory)
+The creation of objects are done only in runtime and the memory allocation is done also in runtime(dynamic runtime or memory allocation) and in compile time it thinks can i allocate the memory
+
+git add .
+git status
+git commit -m "assignments file added and notes updated"
+git push

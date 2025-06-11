@@ -1,0 +1,20 @@
+1. write a program to convert an infix expression to postfix expression and viceversa
+2. write a program to evaluate postfix expression
+3. Implement the algorithm how the floating algorithms stored in memory
+4. which are the two relational operators using which all other relational operators can be implemented?
+
+5.which operator has lesser precedence than assignment operators
+The post increment and post decrement operators have lesser precedence than the assignment operators
+6. which operator has higher precedence than arithmetic operators
+paranthesis operator. Actually it is not the operator but it is used to override the precedence of the operators
+7.drawback of procedural language
+8.drawback of oops
+9.methods vs functions in java
+10.why OS has the authority to allocate memory?
+11.applications vs software vs program?
+12.Bytes of datatypes
+13.public static void main(String[] args)?
+14.Multiprogramming vs Mutilprocessing?
+15.Dynamic vs static memory allocation?
+16.evalution of programming languages?
+17.Memory allocation in C++ and java?
