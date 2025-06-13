@@ -166,10 +166,34 @@ C++ is fast than java during runtime and python is the slowest among all
 The code area has the bytecode i.e .class files
 static/class vars are stored in GDS
 local vars and function parameters ,return address and method address(linkage) are stored in stack area
-all objects are stored in heap(dynamically allocated memory)
+all objects(instance variables) are stored in heap(dynamically allocated memory)
 The creation of objects are done only in runtime and the memory allocation is done also in runtime(dynamic runtime or memory allocation) and in compile time it thinks can i allocate the memory
-
+----------------------------------------------------------------------------------
 git add .
 git status
 git commit -m "assignments file added and notes updated"
 git push
+------------------------------------------------------------------------------------
+1z0-829/1z0-830 java certificaitons 15000/-
+study official documentations
+NPTEL certificaitons
+c-DAC govt of india
+---------------------------------------------------------------------------
+No function overloading in python
+cases of writinig the code(pascal,snake,camel)
+
+//12/6/25 LG Placement exam//
+
+//13/6/25//
+void ,static methods
+
+When an object is created during the runtime , first the control goes to declarative statement, secondly it goes to instance initializer block(un-named block). If it is present , then it goes into the respective constructor.
+All local variables in java are not initialized until it is initialized by the programmer. Thus the local variables will be empty if they are not initialized. the first assignment to the local variable is its initialization.
+Unlike the local variables, the instance variables and the static(class) variables have default values.
+byte,short,int and long instance variables hava 0 as the default values
+float - 0.0f , double - 0.0
+boolean instance or static variable - false
+and if the instance or static variable is a reference type, then its default value will be null (ex:String)
+
+The super() in the constructor will make call to immediate parent class constructor and this call happens right are PROLOG of the child class constructor.
+We can optionally pass args to super(). However in such a case

@@ -18,3 +18,15 @@ paranthesis operator. Actually it is not the operator but it is used to override
 15.Dynamic vs static memory allocation?
 16.evalution of programming languages?
 17.Memory allocation in C++ and java?
+18.java naming standards,function overloading and overriding ,cases of writinig the code(pascal,snake,camel)
+19.instance variables vs class variabales
+20.permutations vs combinations
+21.prolog in functions,apilog,business class 
+22.pojo class (play old java object) 
+23.jvm and jdk
+24.why super keyword is the first statement?
+constructor call should be first in the constructor
+25.this keyword
+for reference,to access overloaded constructor of the same class,to differentiate the names of function parameters and instances
+26.void ,static methods
+27.object vs reference
