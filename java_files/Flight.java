@@ -95,7 +95,7 @@ public class Flight extends Object{
         this.duration = duration;
     }
 //source menu ->generate->hashcode(in eclipse)
-    @Override
+    @Override //@Override is an annotation that gives information to the compiler that this method is overriding a method from the superclass
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -108,9 +108,9 @@ public class Flight extends Object{
         return result;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    @Override 
+    public boolean equals(Object obj)  { //equals is used to compare two objects for equality
+        if (this == obj) //this is a reference variable that refers to the current object
             return true;
         if (obj == null)
             return false;

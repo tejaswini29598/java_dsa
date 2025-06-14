@@ -30,3 +30,4 @@ constructor call should be first in the constructor
 for reference,to access overloaded constructor of the same class,to differentiate the names of function parameters and instances
 26.void ,static methods
 27.object vs reference
+28.cohesion and coupling

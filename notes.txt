@@ -197,3 +197,48 @@ and if the instance or static variable is a reference type, then its default val
 
 The super() in the constructor will make call to immediate parent class constructor and this call happens right are PROLOG of the child class constructor.
 We can optionally pass args to super(). However in such a case
+
+without the input statements all the classes of java.lang are always automatically loaded..
+The System.in,System.out,System.err are inside the lang package
+
+1.check if the given positive integer is a perfect square
+2.exam result percentage
+3.Tax calculation problem
+i/p data :name of the employee,basic salary
+HRA 15% of basic if employee lives in cosmopolitian city, urban city 10%
+
+//14/6/25//
+always use single-responsibility principle because using 2 problem solutions at a time ,it will consume more time 
+JVM-Most important program in JRE,SM,MM,GC(Garbage Collector),BV,LL-all together work under JRE
+1. public static void main(String[] args):-
+In java main() called by OS(JVM) and it does return any value thats why it is void 
+Static - the main method belongs to the class itself, rather than to any specific object of that class.
+public because it is called by the JVM to access the member of the class in some other package
+java is the parent most package in java and Object is the parent most class in java
+
+2. Why constructor has same name as class name and do we hava a return type of java and does not it contain void?
+Constructors have the same name as the class for clear identification and implicit invocation during object creation.The constructor has no return type and the constructor is implicitly void always
+
+1.find sum of the series 1-n+n2-n3...n terms 0<=n<=9 ,1 <=m<=25
+2.find sum of odd digits of a number
+2345=8(3+5)
+3.find sum of even placed digits of a number
+9128735=12(1+8+3)
+91827364=10(1+2+3+4)
+4.second largest and second smallest
+consider an array of 5 elements for example, 4 5 3 2 1
+here the second largest will be 4 and second smallest will be 2
+sort the elements by Arrays.sort(); now it will become 1 2 3 4 5
+consider for loop to make iterations
+in for loop do the iterations upto n elements or n-1
+
+5. Find sum of Odd placed Even Digits in a number. 
+Note: You can make other 3 combinations for the above program.
+6. Find smallest/biggest digit in a number.
+7. Find sum of 1st and last digits in a number.
+8. Find nth placed digit in a number
+9. Count number of Prime digits in a number
+10. Count number of composite digits in a number.
+
+Arrays:-
+
