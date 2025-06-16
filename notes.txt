@@ -199,7 +199,18 @@ The super() in the constructor will make call to immediate parent class construc
 We can optionally pass args to super(). However in such a case
 
 without the input statements all the classes of java.lang are always automatically loaded..
-The System.in,System.out,System.err are inside the lang package
+The System.in,System.out,System.err are inside the java.lang package and here in,out and err are the static reference variables of the System class
+public final class System{
+public static final PrintStream out; ---It is the declaration of the out
+static{
+	out=new PrintStream();
+}
+}
+
+final variable:
+A variable once it is initialized(first assignment) cannot be muted.Thus final variables are read only variables. A final variable can be both static and non-static
+A final class cannot be inherited/extended and a final method is one which cannot be overriden in the derived class
+
 
 1.check if the given positive integer is a perfect square
 2.exam result percentage
@@ -218,6 +229,12 @@ java is the parent most package in java and Object is the parent most class in j
 
 2. Why constructor has same name as class name and do we hava a return type of java and does not it contain void?
 Constructors have the same name as the class for clear identification and implicit invocation during object creation.The constructor has no return type and the constructor is implicitly void always
+
+The threads are nothing but process which run inside the process simultaneously and it is a light-weight process
+A process is a program in execution, meaning it's an active entity running on a computer. It has its own memory space, resources, and can't directly share these with other processes without specific mechanisms
+
+Data structure:-
+Storing data and also arranging/orgranizing it in memory in so specific way to archive some efficiency(space or time or simplicity) is data structure
 
 1.find sum of the series 1-n+n2-n3...n terms 0<=n<=9 ,1 <=m<=25
 2.find sum of odd digits of a number
@@ -239,6 +256,62 @@ Note: You can make other 3 combinations for the above program.
 8. Find nth placed digit in a number
 9. Count number of Prime digits in a number
 10. Count number of composite digits in a number.
-
+-----------------------------------------------------------
+1. Write a program to print Right angled TRiangle of N lines.
+2. Write a program to print Square of N lines.
+3. Write a program to print Hollow Square of N lines.
+4. Write a program to print X shape of N lines.
+5. Write a program to print X shape inside a hollow square of N lines.
+6. Write a program to print Hollow Benzene Ring of N lines.
 Arrays:-
+An array is a DS in which the elements of the array are stored in continous memory locations(There is no gap between 2 consecutive elements in an array).
+All elements of an array are of the same DATATYPE(same size).
+Array in java is an object because the objects has the array itself and also the length variable in it.
+Once the size of an array is fixed, it cannot be changed.
+To delete an array ,just make the reference null
+It is a memory inefficient datastructures ,time efficient and its lookup is O(1)
+simple and primary data structure
+Creating:
+int array[10]; //error
+int[] array = new int[size];
+int[] array =new int[5]{1,2,3,4,5};//error
+int[] array=new int[]{1,2,3,4,5};
+int[] array ={1,2,3,4,5};
 
+--------------------------------------------------------------------------------------------------------
+WEEK-2
+// 16/6/25 //
+
+CONSTRUCTORS:
+*It is called/invoked always implicitly (by the JVM) as soon as an object is created(Objects get memory allocation,that means objects reference values is created).
+*The object must have same name as that of the class so that the compiler/JVM knows which of the non static methods in the class are the constructors.
+*We can define more than one constructor for the class, thus all the constructors must have the same name and this onset is called as "function overloading".
+*The job of the constructor is to initialize an object.
+*A constructor cannot return a value ever. Thus its return type is always void. Now something which is always, in  programming must be implicit, because it is always well known. thus mentioning the returnn type for a constructor becomes redundant and hence there must be no return type to a constructor.
+*A constructor cannot be static because a constructor is working for an object and it is always has "this". If it is static it should be work for class and not for the object.
+* Constructor is usually(99% of the cases) is public.however,they can be private also.
+*Constructor cannot be final
+Ex: Assume there is a class named "Flight"
+Filght(){
+
+}
+Flight(String code){
+
+}
+main(){ //assume this is the main method
+Flight flight = new Flight(); // In this it calls the zero argumented constructor is called, this is called as "STATIC BINDING/COMPILE TIME BIDING/EARLY TIME BINDING"(it decides which function should be called/invoked at the compile stage).
+}
+
+FUNCTION OVERLOADING:
+*It is the compile time(static/early) bindng/polymorphism which of the overloaded methods must be called is decided by the compiler.
+*The overloaded methods if have the same arguments list but different return types then it is an error, because the change must be present at prologue and if the change is only present at apilogue.
+*The overloaded functions/methods must differ in their argument list either by number of arguments or datatypes of the arguments or if incase if both the number of arguments and their types are the same the the order must be different.
+
+RELATIONS IN OOPS:
+1.Generalization(inheritance)- "is-a" type of relationship
+2.Association - "has-a" part of
+3.Aggregation (weak or optional association)
+4.Composition(Strong association)
+
+*Inheritance: suv is a car is-a vehicle
+*Aggregation: 

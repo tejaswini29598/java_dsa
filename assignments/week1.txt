@@ -31,3 +31,30 @@ for reference,to access overloaded constructor of the same class,to differentiat
 26.void ,static methods
 27.object vs reference
 28.cohesion and coupling
+1.find sum of the series 1-n+n2-n3...n terms 0<=n<=9 ,1 <=m<=25
+2.find sum of odd digits of a number
+2345=8(3+5)
+3.find sum of even placed digits of a number
+9128735=12(1+8+3)
+91827364=10(1+2+3+4)
+4.second largest and second smallest
+consider an array of 5 elements for example, 4 5 3 2 1
+here the second largest will be 4 and second smallest will be 2
+sort the elements by Arrays.sort(); now it will become 1 2 3 4 5
+consider for loop to make iterations
+in for loop do the iterations upto n elements or n-1
+
+5. Find sum of Odd placed Even Digits in a number. 
+Note: You can make other 3 combinations for the above program.
+6. Find smallest/biggest digit in a number.
+7. Find sum of 1st and last digits in a number.
+8. Find nth placed digit in a number
+9. Count number of Prime digits in a number
+10. Count number of composite digits in a number.
+-----------------------------------------------------------
+1. Write a program to print Right angled TRiangle of N lines.
+2. Write a program to print Square of N lines.
+3. Write a program to print Hollow Square of N lines.
+4. Write a program to print X shape of N lines.
+5. Write a program to print X shape inside a hollow square of N lines.
+6. Write a program to print Hollow Benzene Ring of N lines.
