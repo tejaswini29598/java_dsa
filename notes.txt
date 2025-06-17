@@ -290,7 +290,9 @@ CONSTRUCTORS:
 *A constructor cannot return a value ever. Thus its return type is always void. Now something which is always, in  programming must be implicit, because it is always well known. thus mentioning the returnn type for a constructor becomes redundant and hence there must be no return type to a constructor.
 *A constructor cannot be static because a constructor is working for an object and it is always has "this". If it is static it should be work for class and not for the object.
 * Constructor is usually(99% of the cases) is public.however,they can be private also.
-*Constructor cannot be final
+*Constructor cannot be final because all constructors are always final by nature i.e suppose the constructor is overriden in the sub class,and we create an object of the base class, the overriden constructor in the subclass becomes always unreachable.
+*The constructor cannot be overriden 
+*Constructors cannot be abstract(becuase the abstract methods are not declared but defined) becuase first of all a class choose instance method is abstract its object cannot be created. Further, even if the constructor is defined in the derived class, we know it is unreachable.
 Ex: Assume there is a class named "Flight"
 Filght(){
 
@@ -308,10 +310,112 @@ FUNCTION OVERLOADING:
 *The overloaded functions/methods must differ in their argument list either by number of arguments or datatypes of the arguments or if incase if both the number of arguments and their types are the same the the order must be different.
 
 RELATIONS IN OOPS:
+the diagrams that will show the relations called "UML Diagrams" and the diagrams which shows the entry and exit loops and conditions are called "Cyclomatic diagrams"
 1.Generalization(inheritance)- "is-a" type of relationship
 2.Association - "has-a" part of
-3.Aggregation (weak or optional association)
-4.Composition(Strong association)
+--Aggregation (weak or optional association)
+--Composition(Strong association)
 
 *Inheritance: suv is a car is-a vehicle
-*Aggregation: 
+*Aggregation: When the whole object existance is independent of the part object then it is aggregation. When the part object(containee) and the whole object(container) can exist independent of each other.
+*Composition: when the whole object existence is dependent on the part of the object existance. When the containee and container cannot exist independent of eachother.
+Real life example
+
+why the main() method is static?
+definition means the data defined between{ }
+
+ABSTRACT CLASS:
+* A class which has at least one abstract method must be marked as abstract
+* A class having all methods defined can also be abstract.
+* A class having all methods abstract(Except constructors) is said to be 100% abstract
+* The derived class which inherits an abstract class can be a concrete class itself doesnot declares any abstract method.
+* If the derived class fails to define anyone of the abstract methods of the parent class then it itself must be marked as abstract
+* An abstract class can still be used via its static memebers
+-----------------------------------------------------------
+no super keyword in c++ instead we use ::
+-----------------------------------------
+create a class to which only one object can be created:
+1.for that we have to make all the constructors private but the User can create only one object inside the function
+2.The user can access the method when it is public static
+3.final A1 a1 = new A1();
+
+public class A1{
+
+}
+public class User{
+	A1 a1= new A1();
+	A1 a2 =new A1();
+}
+Ex2:
+ 
+//Create a class to which only one onject can be created:
+
+public class A1 {
+
+}
+public class User {
+	A a1 = new A();
+	A a2 = new A();
+}
+
+
+import java.util.Scanner;
+
+class Person {
+    private int id;
+    private String name;
+    private char gender;
+    private String location;
+    private static Person person; //person is the reference to the Person
+    
+    private Person() {
+        System.out.println("Person object is created");
+    }
+    
+    public static Person createPerson() {
+        if (person == null) {
+            person = new Person();
+        }
+        return person;
+    }
+    
+    public void setPerson(int id, String name, char gender, String location) {
+        this.id = id;
+        this.name = name;
+        this.gender = gender;
+        this.location = location;
+    }
+    
+    @Override
+    public String toString() {
+        return "Person Details = Id:" + id + ", Name:" + name +
+         ", Gender:" + gender + ", Location:" + location;
+    }
+}
+
+public class Singleton {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Person person1 = Person.createPerson();
+        person1.setPerson(101, "nithin", 'm', "mysuru");
+        System.out.println(person1); // System.out.print(person.toString());
+        
+        Person person2 = Person.createPerson();
+        System.out.println(person2); // System.out.print(person.toString());
+        person2.setPerson(102, "aadya", 'f', "mysuru");
+        System.out.println(person1); // System.out.print(person.toString());
+    }
+}
+
+
+//17/6/25//
+*which string objects in java are not stored in string pool(String pool is a storage space in the Java heap memory where string literals are stored)
+...The string literals which stored with new keyword it wont be stored in string pool
+
+//Orange partition
+n=9 [18,36,5,79,50,65,30,15,33]
+n=7 [15,23,5,30,40,50,55]
+n=6 [50,40,35,30,20,15]
+
+
+The packages only have code but in the folders we have different formats of files
