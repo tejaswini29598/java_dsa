@@ -414,8 +414,43 @@ public class Singleton {
 
 //Orange partition
 n=9 [18,36,5,79,50,65,30,15,33]
+i=0 
+j=0 
+pivot =33
 n=7 [15,23,5,30,40,50,55]
 n=6 [50,40,35,30,20,15]
 
 
 The packages only have code but in the folders we have different formats of files
+The public members of the class are accessible in any other package
+
+Function Call STACK:
+...The intermediate results are stored in accumulator
+
+IR: Instruction Register --- holds address of the current instruction that is running
+PC: Program Counter ----holds address of next instruction to be executed
+SP: Stack Pointer --- holds address of the top frame in the stack
+FP: Frame Pointer --- Holds address of the frame of the funciton which currently running
+Frame:----Memory allocated to a function during runtime
+Contents of the Frame:
+local variables: The default value of the local variable is NULL until it is initialized and it be known at compiletime,the default values are only available for static and instance variables
+function parameter:The value will be known at the runtime
+Function addresses: Called function addresses
+Return address
+when stack  Pointer and frame pointer is null that is the end of the program . This mechanism is designed by Dennis Ritchie
+main(String... args){  //main frame is created first
+   //args is the reference to the String array
+    String s= new String("Hello"); // s is the reference to the string
+    print("I am at home");
+    A();//function call statement
+    print("I am back home");
+}
+A(){
+    int num=10;
+     print("I am at home");
+    B(45);
+    print("I am back home");
+}
+B(int num){
+ print("Hello world");
+}

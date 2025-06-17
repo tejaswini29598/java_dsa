@@ -2,7 +2,7 @@
 2.definition and declaration
 3.which string objects in java are not stored in string pool(String pool is a storage space in the Java heap memory where string literals are stored)
 ...The string literals which stored with new keyword it wont be stored in string pool
-...
+
 
 
 
