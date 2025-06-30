@@ -2,7 +2,13 @@
 2.definition and declaration
 3.which string objects in java are not stored in string pool(String pool is a storage space in the Java heap memory where string literals are stored)
 ...The string literals which stored with new keyword it wont be stored in string pool
-
+4.Abstract class vs interface?
+5.why while loop is used in binary search not do-while?
+6.Auto boxing and Auto unboxing 
+ex:System.out.println("The element" + searchElement +"is found at position" +(searchIndex+1))
+The int value is converted into INTEGER Object in the INTEGER wrapper class and all wrapper classes are placed in java.lang 
+7.Why initialization block is constructed?
+8.stack overflow vs infinity loop?
 
 
 
@@ -65,3 +71,16 @@ Key Steps:
 3.Write the program to print prime numbers between m and n(m<n)
 4.Write a program to print the Nth fibo term,assume 1 and 2 as 1st 2 terms repectively
 5.Print the nth term if the series: 1 2 3 3 5 5 7  8 11 13 13
+
+------------
+//18/6/25//
+1.balancing and existing tree
+refers to converting an unbalanced binary search tree (BST) into a balanced BST to improve performance
+2.take the date class ,print the number of seconds for one execution of while loop and also recursive call
+
+//19/6/25 //
+1.implement stack using ArrayList
+2.write a 2x4 matrix of numbers
+3.write a 4x4 matrix of strings each having 2 letters
+
+//20/6/25//

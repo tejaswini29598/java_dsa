@@ -222,7 +222,7 @@ HRA 15% of basic if employee lives in cosmopolitian city, urban city 10%
 always use single-responsibility principle because using 2 problem solutions at a time ,it will consume more time 
 JVM-Most important program in JRE,SM,MM,GC(Garbage Collector),BV,LL-all together work under JRE
 1. public static void main(String[] args):-
-In java main() called by OS(JVM) and it does return any value thats why it is void 
+In java main() called by OS(JVM) and it doesnot return any value thats why it is void 
 Static - the main method belongs to the class itself, rather than to any specific object of that class.
 public because it is called by the JVM to access the member of the class in some other package
 java is the parent most package in java and Object is the parent most class in java
@@ -454,3 +454,481 @@ A(){
 B(int num){
  print("Hello world");
 }
+
+
+//18/6/25//
+Searching,sorting algorithms:
+CRUD Opearations(5):
+1.File i/p
+2.JDBC(Mysql or MongoDB)
+3.Hibernate(ORM)
+4.SpringBoot(Postman-to test the backend)
+Frontend
+5.HTML/CSS/JS
+6.Reactjs
+7.Bootstrap
+8.Authenticaiton
+9.Multiple entities (More than one tabels in the database)
+
+0! =1 (factorial of zero is 1)
+n!=n×(n−1)!
+1!=1×0!
+⇒1=1×0!
+⇒0!=1
+
+Linear search(sequential): O(n)
+Given a list/array,we have to search for an element.
+Count the frequency of an element (number of occurances).
+Find the biggest element in an array
+Find the 2nd smallest element in an array
+Fing biggest and smallest elements in an array
+Replace the every occurance of x with y in an array
+Remove the spaces or the value -1 in an array
+O(n):
+1.Usually used to find the WCE of an algorithms
+2.It finds the efficiency in terms of N, where N is the size of the i/p list.Thus it depends on N .
+3.We can also find BCE and ACE as well
+4.Its job is not to give the exact efficiency but to reveal the order in which the efficiency is.Thus we must remove the smaller chucks of value and also the constants.
+
+Best case efficiency(BCE)  O(1)
+ACE O(n)
+WCE O(n)
+
+Take the i/p zise from the user.
+create the array with user given size.
+Read the i/p data for the array.
+Now search an element
+Print the o/p - position where the element is found (1st occurance)
+
+Problem:
+ArrayList javacollection
+Project Game 
+     Game
+     Player
+Player
+  id,name,points,playerCount (static)
+  
+define 2 classes:
+Player -pojo class
+PlayerOperation - CRUD 
+ Menu:create/add player , modifyPlayer, deletePlayer, listAllPlayers,
+Main()-- Menu based (do-while switch case)
+
+
+
+OLTP(Online Transactional Processing)
+OLAP(Online Analytical Processing)
+
+inside instance methods we can access static methods
+
+Interface: Type independent and abstract
+
+Binary Search:
+*Auto boxing(the int value is converted into INTEGER Object in the INTEGER wrapper class and all wrapper classes are placed in java.lang) and auto unboxing
+The fastest algorithm
+Pre-requiste: The i/p list must be sorted and we must also know the order of sorting
+first we go to exact mid element 
+if it is even number of elements it is easy,but it is odd number of elements it is not easy(we reduce the search area by 50% percent).
+Example:
+number of searches:
+linear search       binary search
+10,00,000            10,00,000
+9,99,999            5,00,000
+9,99,,998            2,50,000
+9,99,997            1,25,000
+9,99,996            62,500
+9,99,995            31,250
+9,99,994...          15,525.... 1000,500,250,125,62,31,15,7,4,3,2,1
+why the iterations is not visible in binary search?
+The amount of area is decreased and that decrease we can predict but cannot define it 
+Best case efficiency --O(1) (at mid position)
+Finding Worst case efficiency in binary search:
+Assume it has  X  number of iterations
+number of elements in iteration:
+N      N/2 N/4 N/8  .......................... 8    4     2     1
+2**(x-1)                                         2**3 2**2 2**1  2**0
+2**(x-1) =N  ,N is the number of elements in the iterations
+2**(x) = N 
+x= log(N)
+x=y-z
+x=y+z 
+x/y =z 
+y=x/z
+in loop low<=high---when low becomes equal to high it means we became at the last element of the iteration 
+low<high---it prints that There is a chance of the very first element and last element is not found
+
+for all sorting techniques:
+  for i from 0 to n-1:
+      for j from 0 to n-i-1 do:
+         compare consecutive elements
+            swap
+//assume array elements 20
+public void bubbleSort(int[] array){
+    for(int i=0;i<array.length-1;i++){ //here 20-1=19 ,therefore i<18
+        for(int j=0;j<array.length-i;j++){
+          if(array[j]<arr[j+1])
+             swap(array[j],array[j+1]);
+        }
+    }
+}
+
+Best case scenario for almost all sorting techniques are the input array is already sorted(almost sorted)
+Best case efficiency : O(n2)
+Worst :O(n2) 
+worst case scenario for almost all sorting techniques is the input array is already sorted(almost sorted) but we are sorting in reverse order
+Bubble Sort:
+Unsorted array and we will get the sorted array at the end
+Pesimistic sorting technique
+O(n)
+number of swaps is unpredictable
+public void bubbleSort(int[] array){
+     boolean sorted =true; //assume the input array is sorted
+    for(int i=0;i<array.length-1;i++){ //here 20-1=19 ,therefore i<18
+        for(int j=0;j<array.length-i;j++){
+          if(array[j]<arr[j+1]){
+             swap(array[j],array[j+1]);
+             sorted=false;
+          }
+          if(sorted)
+             break;
+        }
+    }
+}
+for optimized bubble sort
+BCE O(n)
+WCE(n2)
+
+5 4 3 2 1
+4 3 2 1 5  4 swaps
+3 2 1 4 5  3
+2 1 3 4 5  2
+1 2 3 4 5  1
+if the i/p size is 5 then the number of swaps is 10
+n*(n-1)/2= 5*(5-1)/2 = 5*4/2=10
+(n-1)(n-1+1)/2  = (5-1)(5-1+1)/2 = (4)(5)/2=10
+
+for all sorting techniques:
+  for i from 0 to n-1:
+      for j from 0 to n-i-1 do:
+         compare consecutive elements
+            swap
+//assume array elements 20
+public void bubbleSort(int[] array){
+    for(int i=0;i<array.length-1;i++){ //here 20-1=19 ,therefore i<18
+        for(int j=0;j<array.length-i;j++){
+          if(array[j]<arr[j+1])
+             swap(array[j],array[j+1]);
+        }
+    }
+}
+
+Best case scenario for almost all sorting techniques are the input array is already sorted(almost sorted)
+Best case efficiency : O(n2)
+Worst :O(n2) 
+worst case scenario for almost all sorting techniques is the input array is already sorted(almost sorted) but we are sorting in reverse order
+//assume elements are 20
+public void bubbleSort(int[] array){
+     boolean sorted =true; //assume the input array is sorted
+    for(int i=0;i<array.length-1;i++){ //here 20-1=19 ,therefore i<18
+        for(int j=0;j<array.length-i;j++){
+          if(array[j]<arr[j+1]){
+             swap(array[j],array[j+1]);
+             sorted=false;
+          }
+          if(sorted)
+             break;
+        }
+    }
+}
+for optimized bubble sort
+BCE O(n)
+WCE O(n2)
+
+
+
+
+
+Selection Sort:
+         4 6 4 1 2 9 10 6
+  index: 0 1 2 3 4 5 6  7
+small =4
+index =0
+
+Insertion Sort (Decrease and Conquer):
+Optimistic sorting technique
+why Insertion sort has better efficiency in the worst case when compared to bubble sort?
+..
+23  11  3 13  7  5  29  17  23 //length=9
+final element :23
+here we shifted no swaped
+now
+11 23
+3 11 23
+3 11 13 23 
+3 7 11 13 23
+3 5 7 11 13 23 
+3 5 7 11 13 23 29 - here zero swap so increment
+3 5 7 11 13 17 23 29 
+3 5 7 11 13 17 23 29 23
+3 5 7 11 13 17 23  23 29 
+
+public void insertionSort(int[] array){
+    for(int i=1;i<array.length;i++){ //run through the elements unsorted array
+        element=array[i];
+        int j=i-1; //j is the index of the element in the sorted array in which we have to compare the element in the unsorted array
+        while(j>=0 && element <array[j]){ //shifting the element in sorted
+            array[j+1]=array[j];
+            j--;
+        }
+        array[j+1] =element;
+    }
+}
+Best case scenario : already sorted array
+BCE -O(n)
+WCE -O(n2)
+average -O(n2)
+
+Quick Sort:
+
+
+
+*Depth/height of the tree ,we can insert 2**(h)-1 ,if the actual number of nodes are less than 2(h)-1 it is imbalanced tree
+AVL TREE:
+
+
+//19/6/25//
+Problem solving in Guvi HCl portal 
+Bitwise Operators:
+& | ^ >> << ~
+byte num1 = 29;//00011101
+byte num2 =18;//00010010
+int result = num1 & num2;
+System.out.println("Num1 and Num2" +result);
+int result1 = num1 & num2;
+System.out.println("Num1 and Num2" +result1);
+int result2 = num1 | num2;
+System.out.println("Num1 and Num2" +result2);
+int result3 = num1 ^ num2;
+System.out.println("Num1 and Num2" +result3);
+int result4 = num1 >> num2; //right shift
+System.out.println("Num1 and Num2" +result4);
+int result5 = num1 << num2; //lef shift
+System.out.println("Num1 and Num2" +result5);
+int result6 = ~ num2;
+System.out.println("Num2 " +result6);
+Problems on Bitwise operators
+1.Find the nth bit of an int variable
+2.flip all the bits of a variable and print its value.
+3.Masking
+-------------------------------------------------------------------
+INTERVIEW SKILLS:
+MCQ TEST:
+MCSR(Multiple choice single response):
+1. Direct method
+2.Indirect method
+MCMR:
+1.Negative marking
+
+Problem: //permutation
+input num =8476273
+output num =the next biggest number (8476327)
+//use this problem using recursion and also can iteration
+//write a four digit number in that any digit should repeat twice only . it is Karprekar constant problem
+i/p: 3421
+step1 : 4321 //decreasing
+1234 //increasing
+4321-1234 =3087 //difference between biggest and smallest
+step2:
+i/p: 3087
+8730
+0378
+8730-0378=8352
+i/p:8352
+int num =scanner.nextInt();
+String inputNum =String.valueOf(nums);
+char[] numArray =input.toCharArray();
+Arrays.sort(numArray);
+inputNum = new String(numArray);
+int small = integer.ParseInt(inputNum);
+StringBuilder sb = new StringBuilder(inputNum);
+sb.reverse();
+inputNum = sb.toString();
+int bigNum = Integer.ParseInt(inputNum);
+int difference = bigNum - small;
+
+
+---------------------------------------------------------------
+DAY9 FRIDAY 20-06-2025 (absent)
+
+STEPS TO DOWNLOAD MYSQL:
+
+Google Search: Download MySQL
+Click on Link:   mysql.com/downloads
+-> MySQL Community GPL Downloads 
+-> MySQL Installer for Windows 
+-> No thanks start my download
+Note: Download the Latest version (8.0.3) and the Bigger Sized File (330 MB or so)
+
+Steps to Install MySQL:
+Choose Setup type as Full -> Click Next
+MySql Server + Mysql WorkBench + MySql Shell (Drag all these to right)
+Do not select the check box -> Click Next
+Click on Execute (Make sure that all 3 Apps are visible in "Installation") -> Click Next
+Type and Networking -> Click Next
+Product Config -> click Next -> Port Number is shown -> Click Next
+Use Strong Password -> Click Next
+Set the Password (Remember it) -> Click Next
+Windows Service -> Click Next
+Server File Permissions -> Click Next
+Apply Config -> Click Execute
+Successful Message -> Click Finish 
+Product Config -> Click Next
+Installation Complete -> Click Finish
+Workbench Runs
+Go to MysQl Folder -> server folder -> bin (Add path to Environment Vars)
+
+cmd -> mysql --version
+
+mysql -u root -p   (To force the mysql to prompt for password)
+
+show databases;  // run this command
+create database db1;
+--------------------------------------------------------------
+//21/6/25//
+if we cant get the version of mysql in command prompt:
+Steps:
+1. c:/programfiles/mysql/mysql server/bin (copy the path)
+2. go to environment variables
+3. path->new -> paste the path
+now go the command prompt and enter mysql --version (it gives the version of the mysql)
+
+C:\Users\tejas>mysql --version
+mysql  Ver 8.0.42 for Win64 on x86_64 (MySQL Community Server - GPL)
+
+C:\Users\tejas>mysql -u root -p
+Enter password: *********  (Teju@2903)
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 22
+Server version: 8.0.42 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql>  show databases
+    -> ;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| world              |
++--------------------+
+6 rows in set (0.01 sec)
+
+mysql> create databse training
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'databse training' at line 1
+mysql> create databse trainingdb;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'databse trainingdb' at line 1
+mysql> create databse trainingdb
+     ->;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'databse trainingdb' at line 1
+mysql> CREATE DATABASE trainingdb;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| trainingdb         |
+| world              |
++--------------------+
+7 rows in set (0.00 sec)
+
+mysql> USE trainingdb;
+Database changed
+
+mysql> create table people(id int primary key auto_increment, name varchar(50) not null, location varchar(50), gender varchar(2), age smallint default(0));
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> insert into people(john,kakinada,M,18);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '18)' at line 1
+mysql> insert into people(john,kakinada,'M',18);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''M',18)' at line 1
+mysql> insert into people('john','kakinada','M',18);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''john','kakinada','M',18)' at line 1
+mysql> insert into people(name,location,gender) values ('john','kakinada','M',18);
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+
+mysql> insert into people(name,location,gender,age) values ('john','kakinada','M',18);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into people(name,location,gender,age) values ('Tom','Rajamundry','M',17);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into people(name,location,gender,age) values ('Lila','kakinada','F',18);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from people;
++----+------+------------+--------+------+
+| id | name | location   | gender | age  |
++----+------+------------+--------+------+
+|  1 | john | kakinada   | M      |   18 |
+|  2 | Tom  | Rajamundry | M      |   17 |
+|  3 | Lila | kakinada   | F      |   18 |
++----+------+------------+--------+------+
+3 rows in set (0.00 sec)
+
+mysql> insert into people(name,gender,age) values ('David','M',18);
+Query OK, 1 row affected (0.01 sec)mysql> select * from people;
++----+-------+------------+--------+------+
+| id | name  | location   | gender | age  |
++----+-------+------------+--------+------+
+|  1 | john  | kakinada   | M      |   18 |
+|  2 | Tom   | Rajamundry | M      |   17 |
+|  3 | Lila  | kakinada   | F      |   18 |
+|  4 | David | NULL       | M      |   18 |
++----+-------+------------+--------+------+
+4 rows in set (0.01 sec)
+
+
+-----------------------23/6/25 to 29/6/25 (Project space holidays)-------------------------------------------
+
+// 30/6/25 //
+Recursion and Backtracking
+>>> Recursion algorithms(Towers of hanoi, fibonnaci series, factorials)
+
+consider 23,87,11,113,56,48,9,103
+now see the digits of the numbers as take 23 in one's place it is having 3 and in ten's place it is having 2
+Therefore in 10^0 (1)=3 and 10^1(10)=2
+now sort the elements according to 1's place
+{011} {023,113,103} {056} {087} {048} {009}
+sorting for ten's place
+{103,009} {011,113} {023} {048} {056} {087}
+sorting at 100's place
+{009,011,023,048,056,087} {103,113} therefore the elements are sorted
+
+Pseudo code:
+function radixSort(array,N,place) //pass {
+   dict = parse of each pair is of key:digit, value:array
+}
+ function sort(array,N){
+    //find the max number in the array
+    max = maximum(array,N)  
+    iterate base/radix/place = 1,10,100 < max
+     radixSort(array,N,place)
+    print(array,N)
+ }

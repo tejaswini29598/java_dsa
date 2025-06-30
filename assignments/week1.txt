@@ -4,24 +4,353 @@
 4. which are the two relational operators using which all other relational operators can be implemented?
 
 5.which operator has lesser precedence than assignment operators
-The post increment and post decrement operators have lesser precedence than the assignment operators
+...The post increment and post decrement operators have lesser precedence than the assignment operators
+
 6. which operator has higher precedence than arithmetic operators
-paranthesis operator. Actually it is not the operator but it is used to override the precedence of the operators
+...paranthesis{} operator. Actually it is not the operator but it is used to override the precedence of the operators
+
 7.drawback of procedural language
+...code duplication, difficulty scaling, maintainability issues, and limited security due to a lack of data hiding
+
 8.drawback of oops
+... increased complexity, potential performance issues, and higher memory usage
+
 9.methods vs functions in java
+...A function is a block of code that performs a specific task and can return a result
+public static int add(a, b){
+    return a + b
+}
+...A method is a function that is associated with a class or object in Java
+public class MathUtils {
+    // Static method
+    public static int add(int a, int b) {
+        return a + b;
+    }
+
+    // Instance method
+    public int multiply(int a, int b) {
+        return a * b;
+    }
+}
+
 10.why OS has the authority to allocate memory?
+...because it is the core manager of the computer's resources, including RAM
+
 11.applications vs software vs program?
+...Software is a broad term that refers to all sets of instructions that tell a computer what to do.
+✅ Includes:
+Applications
+System software (e.g., OS)
+Utility software (e.g., antivirus, disk cleaners)
+Programming software (e.g., compilers, IDEs)
+...A program is a specific set of instructions written in a programming language to perform a task
+...An application (or application software) is a type of software designed for end users to perform specific tasks.
+.Often includes a graphical user interface (GUI).
+.Built from many programs working together.
+
 12.Bytes of datatypes
+...Data Type	Size (Bytes)	Size (Bits)	Default Value	Value Range
+byte	              1 byte	8 bits	         0	       -128 to 127
+short	              2 bytes	16 bits	          0	      -32,768 to 32,767
+int	                  4 bytes	32 bits	          0	     -2,147,483,648 to 2,147,483,647
+long	              8 bytes	64 bits	          0L	-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
+float	              4 bytes	32 bits	         0.0f	~ ±3.4e38 (6-7 decimal digits)
+double	              8 bytes	64 bits	         0.0d	~ ±1.8e308 (15-16 decimal digits)
+char	               2 bytes	16 bits     	\u0000	0 to 65,535 (Unicode characters)
+boolean	          JVM-dependent	 ~1 bit*	    false	       true or false
+
 13.public static void main(String[] args)?
+...In java main() called by OS(JVM) and it doesnot return any value thats why it is void 
+.Static - the main method belongs to the class itself, rather than to any specific object of that class.
+.public because it is called by the JVM to access the member of the class in some other package
+.java is the parent most package in java and Object is the parent most class in java
+... 1. public
+It is an access modifier.
+Means the method is accessible from anywhere.
+...2. static
+It is used to define class-level members (methods or variables) that do not belong to any specific object, but to the class itself.
+It means this method belongs to the class, not to objects of the class.
+The JVM doesn’t create an object of your class to start the program — so main() must be static
+When you declare something as static, you're saying:
+“This belongs to the class, not to any instance (object) of the class.”
+...3. void
+The return type of the method.
+Means the method does not return anything.
+...4. main
+This is the name of the method.
+It’s predefined in Java as the starting point for execution.
+...5. String[] args
+It is an array of String values.
+Used to receive command-line arguments.
+Example:
+bash : java MyClass hello world
+In this case, args[0] = "hello" and args[1] = "world"
+
 14.Multiprogramming vs Mutilprocessing?
+...1. Multiprogramming
+Multiprogramming is the ability of an OS to load multiple programs into memory and execute them one at a time, by switching between them.
+🔸 Key Points:
+One CPU (Single processor)
+Increases CPU utilization by keeping it busy while waiting for I/O.
+No parallel execution, only context switching.
+🧠 Think of it as:
+"CPU runs one program at a time, but quickly switches between many in memory."
+📌 Example:
+While a program is waiting to read from a disk, the CPU switches to another program.
+... 2. Multiprocessing
+✅ Definition:
+Multiprocessing is the use of two or more CPUs (processors) within a single system to execute multiple processes simultaneously.
+🔸 Key Points:
+Multiple CPUs
+Can execute more than one process at the same time (in true parallelism)
+Used in modern computers and servers
+🧠 Think of it as:
+"Multiple brains (CPUs) working at the same time on different tasks."
+📌 Example:
+CPU1 runs a video player, CPU2 runs a browser — both at the same time.
+...but If the process is a program in execution, then why do we have separate terms: multiprogramming and multiprocessing?"
+Concept	
+                          Multiprogramming	                       Multiprocessing
+What it focuses on	   Managing multiple programs in memory	      Using multiple processors
+CPU count	                         Only 1	                               2 or more
+Execution type	               Sequential (but fast)	              Truly parallel
+Type of OS concep            Software-level design	           Hardware + OS-level design
+
+🧠 Summary Analogy:
+Situation	                             Analogy
+Multiprogramming	One cook handling many dishes, switching between them
+Multiprocessing	     Many cooks each handling their own dish at the same time
+
 15.Dynamic vs static memory allocation?
+...🔹 Static Memory Allocation
+✅ Definition:
+Memory size is fixed and allocated at compile time before the program runs.
+🔸 Characteristics:
+Size must be known before execution.
+Memory stays allocated throughout the program (or until the variable goes out of scope).
+Used for global variables, static variables, and local variables with fixed size.
+Memory allocation is fast and simple.
+Less flexible; cannot resize during runtime.
+📌 Example in Java:
+java
+Copy
+Edit
+int[] arr = new int[10]; // array size fixed at 10 elements
+Here, memory for arr is allocated with size 10 when the program runs (actually at runtime, but the size is fixed and known).
+
+...🔹 Dynamic Memory Allocation
+✅ Definition:
+Memory is allocated during runtime as needed, and can be resized or freed later.
+🔸 Characteristics:
+Size can be decided while the program is running.
+Allows for flexibility — allocate memory only when needed.
+The programmer (or runtime environment) controls allocation and deallocation.
+Slightly slower than static allocation because it involves managing heap memory.
+Used for data structures like linked lists, trees, dynamic arrays.
+
+📌 Example in Java:
+java
+ArrayList<Integer> list = new ArrayList<>(); 
+list.add(5);
+list.add(10);
+ArrayList grows dynamically as you add elements; memory allocation happens at runtime.
+
+✅ Summary Table
+| Feature            | Static Memory Allocation          | Dynamic Memory Allocation                  |
+| ------------------ | --------------------------------- | ------------------------------------------ |
+| When Allocated     | Compile time                      | Runtime                                    |
+| Flexibility        | Fixed size                        | Resizable, flexible                        |
+| Memory Location    | Stack or data segment             | Heap                                       |
+| Speed              | Faster allocation/deallocation    | Slightly slower due to management overhead |
+| Examples in Java   | Primitive variables, fixed arrays | Collections like ArrayList, LinkedList     |
+| Programmer Control | Less control over allocation      | More control (via objects and collections) |
+
+
+🔸 Important Note in Java:
+Java doesn’t allow explicit manual memory management like C/C++ (no malloc or free).
+The Java runtime manages heap memory automatically via Garbage Collection.
+When you create objects (e.g., new keyword), memory is dynamically allocated on the heap.
+
 16.evalution of programming languages?
+
 17.Memory allocation in C++ and java?
+...🔹 Memory Allocation in C++
+.1. Stack Allocation
+Local variables inside functions are allocated on the stack.
+Memory is automatically managed: created when the function is called, destroyed when it returns.
+Fast allocation/deallocation.
+Size must be known at compile time.
+.2. Heap Allocation (Dynamic)
+Use operators new and delete to manually allocate and free memory.
+Programmer controls when to allocate and free memory.
+Flexible but error-prone (can cause memory leaks or dangling pointers if not handled carefully).
+.3. Static Allocation
+Global variables and static variables are allocated in a fixed memory area.
+Allocated once and exist throughout the program run.
+Example:
+int main() {
+    int x = 10;           // stack
+    int* p = new int(20); // heap
+    delete p;             // free heap memory
+}
+... Memory Allocation in Java
+.1. Stack Allocation
+Local primitive variables (like int, char) and references to objects are stored on the stack.
+Memory management is automatic; stack memory is freed when method exits.
+.2. Heap Allocation
+All objects (instances of classes) are allocated on the heap.
+Memory is managed automatically by the Garbage Collector — no manual freeing needed.
+JVM tracks object usage and frees memory for objects no longer referenced.
+.3. Static Allocation
+Static variables and constants are stored in the method area (part of JVM memory).
+Exist throughout the lifetime of the program.
+Example:
+public class Example {
+    public static void main(String[] args) {
+        int x = 10;             // stack
+        Example obj = new Example();  // heap
+    }
+}
+| Aspect              | C++                                | Java                             |
+| ------------------- | ---------------------------------- | -------------------------------- |
+| Stack Allocation    | Local variables and function calls | Primitives and object references |
+| Heap Allocation     | Manual with `new` and `delete`     | Automatic with Garbage Collector |
+| Memory Management   | Programmer-controlled              | Automatic (Garbage Collection)   |
+| Static Variables    | Fixed memory area                  | Method area in JVM               |
+| Risk of Memory Leak | High if `delete` is missed         | Low due to Garbage Collector     |
+
 18.java naming standards,function overloading and overriding ,cases of writinig the code(pascal,snake,camel)
-19.instance variables vs class variabales
+...1. Java Naming Standards
+| Element            | Naming Convention                                        | Example               |
+| ------------------ | -------------------------------------------------------- | --------------------- |
+| **Class Names**    | PascalCase (Each word starts with a capital letter)      | `StudentRecord`       |
+| **Method Names**   | camelCase (First word lowercase, next words capitalized) | `calculateTotal()`    |
+| **Variable Names** | camelCase                                                | `totalAmount`         |
+| **Constants**      | UPPERCASE\_WITH\_UNDERSCORES                             | `MAX_SIZE`            |
+| **Packages**       | lowercase, usually domain-based                          | `com.example.project` |
+...2. Function Overloading vs Overriding in Java
+| Aspect      | Function Overloading                                         | Function Overriding                                               |
+| ----------- | ------------------------------------------------------------ | ----------------------------------------------------------------- |
+| What it is  | Same method name, different parameters in the **same class** | Subclass provides a new version of a superclass method            |
+| Parameters  | Must differ (number, type, or order)                         | Must be exactly the same                                          |
+| Return type | Can differ                                                   | Usually same or covariant return type                             |
+| Inheritance | No (within same class)                                       | Yes (between superclass and subclass)                             |
+| Purpose     | To perform similar operations with different inputs          | To modify behavior of inherited methods                           |
+| Example     | `void print(int x)`, `void print(String s)`                  | `class A { void show() {} } class B extends A { void show() {} }` |
+...3. Naming Styles (Cases) for Writing Code
+| Case Name       | Description                                                       | Example           | Usage in Java                           |
+| --------------- | ----------------------------------------------------------------- | ----------------- | --------------------------------------- |
+| **PascalCase**  | Each word starts with a capital letter (no spaces or underscores) | `CalculateTotal`  | Class names (`MyClass`)                 |
+| **camelCase**   | First word lowercase, next words capitalized                      | `calculateTotal`  | Methods and variables                   |
+| **snake\_case** | Words separated by underscores, all lowercase                     | `calculate_total` | Not common in Java, more in Python or C |
+
+19.instance variables vs class variabales?
+🔹 1. Instance Variables
+✅ What are they?
+Belong to an object (instance) of a class.
+Each object has its own copy.
+Declared without the static keyword.
+🧠 Think of:
+"Each student (object) has their own name and age (instance variables)."
+Example:
+class Student {
+    String name;     // instance variable
+    int age;         // instance variable
+}
+🔹 2. Class Variables (Static Variables)
+✅ What are they?
+Belong to the class, not individual objects.
+Shared among all instances of the class.
+Declared using the static keyword.
+🧠 Think of:
+"All students study in the same college — that's shared info."
+Example:
+class Student {
+    static String college = "ABC University"; // class variable
+}
+
 20.permutations vs combinations
+...🔹 Permutations – Order matters
+✅ Definition:
+Permutations count arrangements of items, where the order is important.
+📌 Example: Arranging 3 books on a shelf — ABC, ACB, BAC, etc. All different permutations.
+🔢 Formula:
+P(n, r) = n! / (n - r)!
+🧠 Key Idea:
+"Permutations = Different ways to arrange items."
+...🔹 Combinations – Order doesn’t matter
+✅ Definition:
+Combinations count selections of items, where the order is not important.
+📌 Example: Choosing 3 fruits out of 5 — Apple, Banana, Cherry is same as Banana, Cherry, Apple.
+🔢 Formula:
+C(n, r) = n! / (r! × (n - r)!)
+🧠 Key Idea:
+"Combinations = Different ways to select items."
+| Situation                                 | Permutation or Combination? | Why?                            |
+| ----------------------------------------- | --------------------------- | ------------------------------- |
+| Selecting a team of 3 from 5 players      | ✅ Combination               | Order doesn't matter            |
+| Assigning 3 medals (gold, silver, bronze) | ✅ Permutation               | Order matters (1st, 2nd, 3rd)   |
+| Setting a 4-digit password                | ✅ Permutation               | 1234 ≠ 4321                     |
+| Choosing 2 books to read from a set of 5  | ✅ Combination               | Order of reading doesn't matter |
+
 21.prolog in functions,apilog,business class 
+...🔹 1. Prolog in Functions
+✅ Meaning 1: General Programming Use
+In some contexts, prolog refers to the setup or initial part of a function — where you declare variables, validate inputs, or perform setup tasks before the main logic runs.
+✅ Meaning 2: Assembly / Low-level
+In compiled languages like C/C++, the function prolog is the machine code added by the compiler at the beginning of a function to:
+Save the old frame pointer,
+Set up the new stack frame.
+...🔹 2.Epilogue in functions
+In Java, epilogue (often spelled as "epilog" or "epilogue") is not a keyword or built-in feature — instead, it's a concept often used in the context of:
+
+🔹 Function Epilogue in Programming
+Just like a prologue is the beginning part of a function (e.g., setting up variables), the epilogue is the cleanup or ending part of a function.
+
+In Java, the function epilogue may involve:
+✅ What Happens in a Function Epilogue?
+Returning a value
+Cleaning up resources (closing files, streams)
+Logging exit or result
+Handling exceptions or finalization
+🔸 Example:
+public int calculate(int a, int b) {
+    // Prologue: setup
+    int result = 0;
+    
+    try {
+        // Main logic
+        result = a + b;
+    } catch (Exception e) {
+        System.out.println("Error: " + e.getMessage());
+    } finally {
+        // Epilogue: cleanup
+        System.out.println("Calculation done.");
+    }
+
+    // Epilogue: return value
+    return result;
+}
+| Part         | Description                            | Example in Java                      |
+| ------------ | -------------------------------------- | ------------------------------------ |
+| **Prologue** | Initialization, setup                  | Variable declarations, logging start |
+| **Body**     | Core logic                             | Business operations, calculations    |
+| **Epilogue** | Return statement, cleanup, logging end | `return`, `finally`, `close()`       |
+
+...🔹 3. Business Class / Business Layer
+✅ In Software Architecture (like MVC):
+Business Class (or Business Logic Layer / Service Layer) refers to:
+The part of code that contains the core application logic.
+Sits between the Controller (API) and the Database (Data Access Layer).
+Performs calculations, validations, and processing before sending or saving data.
+// Business Class
+public class OrderService {
+    public double calculateTotal(Order order) {
+        // business logic: add discounts, tax etc.
+        return order.getSubtotal() * 1.18;
+    }
+}
+
 22.pojo class (play old java object) 
 23.jvm and jdk
 24.why super keyword is the first statement?
@@ -31,6 +360,10 @@ for reference,to access overloaded constructor of the same class,to differentiat
 26.void ,static methods
 27.object vs reference
 28.cohesion and coupling
+29.Why the constructor doesnot have abstract,static and static final?
+Constructors cannot be abstract(becuase the abstract methods are not declared but defined) becuase first of all a class choose instance method is abstract its object cannot be created. Further, even if the constructor is defined in the derived class, we know it is unreachable.
+
+---------------------------------------------------------
 1.find sum of the series 1-n+n2-n3...n terms 0<=n<=9 ,1 <=m<=25
 2.find sum of odd digits of a number
 2345=8(3+5)
