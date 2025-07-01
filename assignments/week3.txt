@@ -1,2 +1,9 @@
 1. Towers of hanoi
+..The goal is to move all the disks from one rod to another, following specific rules: 
+...only one disk can be moved at a time,
+... a larger disk cannot be placed on top of a smaller disk, 
+...and only the top disk on a stack can be moved.
+The minimum number of moves required to solve the puzzle with n disks is 2n - 1. 
+for n=4 we have 2^4 - 1 = 15 moves.
+
 2.Difference between recursion and iteration and backtracking?

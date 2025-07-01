@@ -910,7 +910,66 @@ Query OK, 1 row affected (0.01 sec)mysql> select * from people;
 // 30/6/25 //
 Recursion and Backtracking
 >>> Recursion algorithms(Towers of hanoi, fibonnaci series, factorials)
+A recursion function is the function that calls itself either directly or indirectly
+Structure of a recursive function:
+1.Base case:
+  The condition under which the function will not call itself again
+2.Recursive case:
+    The condition under which the function will call itself again with a simpler or smaller input
 
+Types of Recursion:
+1.Direct Recursion:
+   The function calls itself directly
+   Example: Factorial function
+   factorial(n) {
+       if (n == 0) return 1; // Base case
+       return n * factorial(n - 1); // Recursive case
+   }
+2.Indirect Recursion:
+    The function calls another function, which in turn calls the first function
+    Example: Two functions calling each other
+    functionA() {
+         functionB();
+    }
+    functionB() {
+         functionA();
+    }
+3.Tail Recursion:
+    The recursive call is the last operation in the function, allowing for optimization by the compiler or interpreter
+    Example: Tail-recursive factorial function
+    tailFactorial(n, accumulator = 1) {
+         if (n == 0) return accumulator; // Base case
+         return tailFactorial(n - 1, n * accumulator); // Recursive case
+    }
+
+Advantages:
+..Simplifies code for the Problems that have a recursive structure 
+..can make code more reliable and easier to understand
+Disadvantages:
+..Can lead to stack overflow if the recursion depth is too high
+
+Usage:
+..Mathematical problems (factorial, Fibonacci)
+..Data structures (trees, graphs)
+..Algorithms(quick sort, merge sort,binary search)
+
+>>> Backtracking:
+It is systematically searches for a solution to a problem among all available options
+It is a problem-solving technique that builds candidates for solutions incrementally and abandons candidates as soon as it determines that they cannot lead to a valid solution
+
+Structure of a Backtracking Algorithm:
+1.Choose:
+   Select an option from the available choices
+2. Explore:
+   Recursively explore the next level of the search space
+3. Evaluate:
+   Check if the current solution is valid
+4. Backtrack:
+   If the solution is not valid, undo the last step and try the next option
+
+How backtracking works:
+
+** Radix Sort **
 consider 23,87,11,113,56,48,9,103
 now see the digits of the numbers as take 23 in one's place it is having 3 and in ten's place it is having 2
 Therefore in 10^0 (1)=3 and 10^1(10)=2
@@ -924,6 +983,17 @@ sorting at 100's place
 Pseudo code:
 function radixSort(array,N,place) //pass {
    dict = parse of each pair is of key:digit, value:array
+   for 0 in array:
+    digit = 0/place % 10
+    if the key 'digit' not in dict:
+      dict[digit] = new arr
+    dict[digit].add(0)
+   //copy numbers in the dictionary back to array
+   i =0
+   for group in dictValues:
+     for 0 in group:
+        arr[i]=0
+        i++
 }
  function sort(array,N){
     //find the max number in the array
@@ -932,3 +1002,203 @@ function radixSort(array,N,place) //pass {
      radixSort(array,N,place)
     print(array,N)
  }
+
+** Bucket Sort **
+the bucket sort technique is used to store the elements in the given range in the buckets 
+in other words,  distributing elements of an array into a number of "buckets." Each bucket is then sorted individually(we can use any sorting technique), and finally, the elements are gathered back into the original array in sorted order.
+
+
+//1/7/25//
+N-Queens:
+Detailed step-by-step explanation of the provided N-Queens code:
+    1. Imports and Class Declaration
+        ```java
+        import java.util.*;
+
+        public class NQueens {
+        ```
+        - `import java.util.*;`  
+           imports all utility classes 
+           (like `Scanner`, `List`, `ArrayList`, etc.).
+        - The class `NQueens` contains the main logic.
+
+    2. Main Method
+        ```java
+        public static void main(String[] args) {
+            Scanner sc = new Scanner(System.in);
+            int n = sc.nextInt();
+            List<List<String>> solutions = solveNQueens(n);
+            if (solutions.isEmpty()) {
+                System.out.println("No solution");
+            } else {
+                for (List<String> sol : solutions) {
+                    for (String row : sol) {
+                        System.out.println(row);
+                    }
+                    System.out.println();
+                }
+            }
+        }
+        ```
+        - Reads an integer `n` 
+          (the size of the chessboard and number of queens).
+        - Calls `solveNQueens(n)` 
+          to get all valid solutions.
+        - If no solution exists, 
+          prints "No solution".
+        - Otherwise, 
+          prints each solution (each as a list of strings, one per row).
+
+    3. Solving N-Queens
+        ```java
+        private static List<List<String>> solveNQueens(int n) {
+            List<List<String>> res = new ArrayList<>();
+            char[][] board = new char[n][n];
+            for (char[] row : board) Arrays.fill(row, '.');
+            backtrack(res, board, 0, n, new boolean[n], new boolean[2 * n], new boolean[2 * n]);
+            return res;
+        }
+        ```
+        - Initializes the result list `res`.
+        - Creates an `n x n` board filled with `'.'` (empty cells).
+        - Calls `backtrack` to fill the board row by row.
+        - Uses three boolean arrays to track columns and diagonals:
+        - `cols`: columns with queens.
+        - `d1`: "main" diagonals (top-left to bottom-right).
+        - `d2`: "anti" diagonals (top-right to bottom-left).
+
+    4. Backtracking Function
+        ```java
+        private static void backtrack(List<List<String>> res, char[][] board, int row, int n, boolean[] cols, boolean[] d1, boolean[] d2) {
+            if (row == n) {
+                List<String> sol = new ArrayList<>();
+                for (char[] r : board) sol.add(new String(r));
+                res.add(sol);
+                return;
+            }
+            for (int col = 0; col < n; col++) {
+                int id1 = col - row + n, id2 = col + row;
+                if (cols[col] || d1[id1] || d2[id2]) continue;
+                board[row][col] = 'Q';
+                cols[col] = d1[id1] = d2[id2] = true;
+                backtrack(res, board, row + 1, n, cols, d1, d2);
+                board[row][col] = '.';
+                cols[col] = d1[id1] = d2[id2] = false;
+            }
+        }
+        ```
+        - Base Case: If `row == n`, a valid solution is found. 
+          Convert the board to a list of strings and add to results.
+        - For Each Column: Try placing a queen 
+          in each column of the current row.
+        - Diagonal Indexing:
+            - `id1 = col - row + n` for main diagonals 
+            (offset by `n` to avoid negative indices).
+            - `id2 = col + row` for anti-diagonals.
+        - Safety Check: If the column or 
+          either diagonal is already occupied, 
+          skip.
+        - Place Queen: 
+          Mark the board and tracking arrays.
+        - Recursive Call: Move to the next row.
+        - Backtrack: Remove the queen and 
+          reset tracking arrays (undo the move).
+        - Continue until all columns are tried.
+
+** Sudoko **
+It is a 9x9 grid puzzle where the objective is to fill the grid with digits from 1 to 9 such that no row,column and subgrid contains the same digit more than once.
+Step-by-step explanation of your Sudoku solver code:
+    1. Imports and Class Declaration
+        ```java
+        import java.util.*;
+
+        public class SudokuSolver {
+        ```
+        - Imports all classes from `java.util` (only `Scanner` is used).
+        - Declares the `SudokuSolver` class.
+
+    2. Main Method: Input and Output
+        ```java
+        public static void main(String[] args) {
+            Scanner sc = new Scanner(System.in);
+            char[][] board = new char[9][9];
+            for (int i = 0; i < 9; i++) {
+                String[] line = sc.nextLine().trim().split("\\s+");
+                for (int j = 0; j < 9; j++) {
+                    board[i][j] = line[j].charAt(0);
+                }
+            }
+            solveSudoku(board);
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    System.out.print(board[i][j]);
+                    if (j < 8) System.out.print(" ");
+                }
+                System.out.println();
+            }
+        }
+        ```
+        - Reads a 9x9 Sudoku board from standard input, one line at a time.
+        - Each line is split by whitespace, and 
+          each cell is stored as a `char` 
+          (e.g., `'5'`, `'.'` for empty).
+        - Calls `solveSudoku(board)` to solve the puzzle.
+        - Prints the solved board, formatting with spaces between numbers.
+
+        Gotcha: Input must be 9 lines, 
+                each with 9 space-separated characters.
+
+    3. Sudoku Solver (Backtracking)
+        ```java
+        public static boolean solveSudoku(char[][] board) {
+            for (int row = 0; row < 9; row++) {
+                for (int col = 0; col < 9; col++) {
+                    if (board[row][col] == '.') {
+                        for (char c = '1'; c <= '9'; c++) {
+                            if (isValid(board, row, col, c)) {
+                                board[row][col] = c;
+                                if (solveSudoku(board)) return true;
+                                board[row][col] = '.';
+                            }
+                        }
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        ```
+        - Loops through each cell.
+        - If an empty cell (`'.'`) is found:
+        - Tries all digits `'1'` to `'9'`.
+        - If `isValid` returns true, 
+          places the digit and recursively tries to solve the rest.
+        - If recursion fails, resets the cell to `'.'` (backtracks).
+        - If all cells are filled, returns `true` (solved).
+
+        Gotcha: Returns `false` if no valid digit can be placed, 
+                triggering backtracking.
+
+    4. Validation Function
+        ```java
+        private static boolean isValid(char[][] board, int row, int col, char c) {
+            for (int i = 0; i < 9; i++) {
+                if (board[row][i] == c) return false; // Row check
+                if (board[i][col] == c) return false; // Column check
+                if (board[3*(row/3)+i/3][3*(col/3)+i%3] == c) return false; // 3x3 box check
+            }
+            return true;
+        }
+        ```
+        - Checks if placing `c` at `(row, col)` is valid:
+        - Not already in the same row.
+        - Not already in the same column.
+        - Not already in the same 3x3 subgrid.
+
+        Gotcha: The 3x3 box calculation is a common source of confusion:
+        - `3*(row/3)` and `3*(col/3)` find the top-left corner of the box (sub-grid).
+        - `i/3` and `i%3` iterate over the 3x3 box.
+
+** Permutation of a string **
+A permutation of a string is a "rearrangement" of its characters to form a new string or sequence. It essentially means changing the order of the characters while keeping all the original characters present
+n!--- for the permutation for not repeated characters
