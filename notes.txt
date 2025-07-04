@@ -1208,3 +1208,84 @@ n!--- for the permutation for not repeated characters
 
 // 2/7/25 //
 >>>DFS and BFS 
+why scanner.nextLine(); is added before declaration of string like this  Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        List<Integer> arr = new ArrayList<>();
+        scanner.nextLine();
+        String secondLine =scanner.nextLine();
+// This is done to consume the newline character left in the input buffer after reading an integer with nextInt().
+// If we don't do this, the next call to nextLine() will read an empty string
+// because it encounters the leftover newline character from the previous input.
+int n = scanner.nextInt();   // reads number, leaves \n
+scanner.nextLine();          // consumes the leftover newline
+String secondLine = scanner.nextLine();  // now reads the actual line
+
+input: 
+5
+10 20 30 40 50
+output:
+line = ""   // oops! it's just the leftover \n
+10 20 30 40 50
+
+int n = scanner.nextInt();
+scanner.nextLine();  // flush the newline
+String line = scanner.nextLine();  // correctly reads "10 20 30 40 50"
+// This ensures that the nextLine() call works as expected and captures the intended input.
+>>>Heap techniques 
+32 29 3 4 1 5 6 18 7 20  n=10
+
+// 3/7/25  afternoon:AMCAT exam //
+
+Queue : offer() ,poll(), peek() 
+>>peek():
+ Returns the smallest element (for a min-heap) or the largest element (for a max-heap) without removing it from the heap.
+>> poll()
+ Returns and removes the smallest (min-heap) or largest (max-heap) element from the heap.
+... peek() → look at the top element
+...poll() → remove and return the top element
+ minHeap.offer(5);
+        minHeap.offer(3);
+        minHeap.offer(8);  
+minheap:[3, 5, 8]
+Index:   0   1   2
+Value:   3   5   8
+
+        3        ← index 0
+       / \
+      5   8      ← indices 1 and 2
+heap[i] <= heap[2*i + 1]  // left child (if exists)
+heap[i] <= heap[2*i + 2]  // right child (if exists)
+For i = 0 (value = 3):
+Left child: heap[1] = 5 → ✅ 3 <= 5
+Right child: heap[2] = 8 → ✅ 3 <= 8
+Heap condition is satisfied.
+
+For i = 1 (value = 5):
+2*i + 1 = 3 and 2*i + 2 = 4 → indices out of bounds → no children → ✅
+
+For i = 2 (value = 8):
+Same: no children → ✅
+
+SOLID principles:
+>> open-close principle(O) , single rule principle(S), liskov substitution principle(L), dependency inversion principle(D), interface segregation principle(I)
+>> Liskov Substitution Principle (LSP):
+    - Objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program.
+    - Example: If `Bird` is a superclass and `Penguin` is a subclass, then `Penguin` should be able to replace `Bird` without causing issues in the code that uses `Bird`.
+>> Dependency Inversion Principle (DIP):
+    - High-level modules should not depend on low-level modules. Both should depend on abstractions (interfaces).
+    - Abstractions should not depend on details; details should depend on abstractions.
+    - Example: Instead of a class directly instantiating another class, it should use an interface or abstract class to allow for flexibility and easier testing.
+>>open-close principle:
+open for extension, closed for modification
+    - Classes should be open for extension but closed for modification.
+    - This means you can add new functionality by extending existing classes without changing their source code.
+    - Example: If you have a class `Shape`, you can extend it to create `Circle` and `Square` without modifying the `Shape` class itself.
+>> Single Responsibility Principle (SRP):
+    - A class should have only one reason to change, meaning it should have only one job or responsibility.
+    - Example: A class that handles user authentication should not also handle user notifications. These should be separate classes.
+>> Interface Segregation Principle (ISP):
+    - Clients should not be forced to depend on interfaces they do not use.
+    - This means that interfaces should be small and specific rather than large and general.
+    - Example: Instead of having a single `Animal` interface with methods for flying, swimming, and walking, you could have separate interfaces like `Flyable`, `Swimmable`, and `Walkable` so that classes only implement what they need.
+
+//4/7/25//

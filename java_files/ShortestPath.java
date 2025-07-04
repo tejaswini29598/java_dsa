@@ -53,8 +53,15 @@ public class ShortestPath {
         queue.offer(new int[]{s, 0});
         visited[s] = true;
 
+        /* - While the queue is not empty:
+            - Dequeue the current node and its distance.
+            - For each unvisited neighbor:
+                - If neighbor is the destination, return distance + 1.
+                - Otherwise, mark as visited and 
+                  enqueue with incremented distance.
+         */
         while (!queue.isEmpty()) {
-            int[] curr = queue.poll(); //queue.poll () used to retrieve and remove the head (front) element of the queue.
+            int[] curr = queue.poll(); //queue.poll() used to retrieve and remove the head (front) element of the queue.
             int node = curr[0], dist = curr[1];
             for (int neighbor : adj.get(node)) {
                 if (!visited[neighbor]) {

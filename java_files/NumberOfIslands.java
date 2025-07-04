@@ -9,7 +9,7 @@ public class NumberOfIslands {
         m =scanner.nextInt();
         System.out.println("Enter column");
          n=scanner.nextInt();
-         scanner.nextLine();
+        scanner.nextLine();
         matrix = new char[m][n];
         visited = new boolean[m][n];
         for (int i = 0; i < m; i++) {

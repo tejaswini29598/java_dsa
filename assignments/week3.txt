@@ -7,3 +7,26 @@ The minimum number of moves required to solve the puzzle with n disks is 2n - 1.
 for n=4 we have 2^4 - 1 = 15 moves.
 
 2.Difference between recursion and iteration and backtracking?
+3.why scanner.nextLine(); is added before declaration of string like this  Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        List<Integer> arr = new ArrayList<>();
+        scanner.nextLine();
+        String secondLine =scanner.nextLine();
+// This is done to consume the newline character left in the input buffer after reading an integer with nextInt().
+// If we don't do this, the next call to nextLine() will read an empty string
+// because it encounters the leftover newline character from the previous input.
+int n = scanner.nextInt();   // reads number, leaves \n
+scanner.nextLine();          // consumes the leftover newline
+String secondLine = scanner.nextLine();  // now reads the actual line
+
+input: 
+5
+10 20 30 40 50
+output:
+line = ""   // oops! it's just the leftover \n
+10 20 30 40 50
+
+int n = scanner.nextInt();
+scanner.nextLine();  // flush the newline
+String line = scanner.nextLine();  // correctly reads "10 20 30 40 50"
+// This ensures that the nextLine() call works as expected and captures the intended input.
