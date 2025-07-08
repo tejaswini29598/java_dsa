@@ -30,3 +30,10 @@ int n = scanner.nextInt();
 scanner.nextLine();  // flush the newline
 String line = scanner.nextLine();  // correctly reads "10 20 30 40 50"
 // This ensures that the nextLine() call works as expected and captures the intended input.
+
+
+non-linear data structures
+heap,queues,trees,graphs
+
+hashtables and hashmaps
+dynamic programming

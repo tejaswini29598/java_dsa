@@ -19,7 +19,8 @@ public class MinVertex {
         }
         dp = new int[n + 1][2];
         for (int[] row : dp) Arrays.fill(row, -1);
-        System.out.println(dfs(1, 0, -1));
+       // System.out.println(Math.max(dfs(1, 0, -1),dfs(1, 1, -1)));
+       System.out.println(dfs(1,1,-1));
     }
 
     // state: u = current node, take = 0/1 (not taken/taken), par = parent

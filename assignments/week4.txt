@@ -1,0 +1,9 @@
+knapsack
+unique paths
+longest path
+max path sum
+travelsalesman
+
+what is the difference between level and height of a tree?
+Level: The distance from the root node (root is at level 0).
+Height: The length of the longest path from the root to a leaf.
