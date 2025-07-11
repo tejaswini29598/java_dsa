@@ -2617,7 +2617,67 @@ Red-Black Tree - Operations
                         node = root
             node.color = BLACK
         ````
+RBT - functions 
+       x
+      / \
+     α   y
+        / \
+       β   γ
+    ==>
+       y
+      / \
+     x   γ
+    / \
+   α   β
+    private void leftRotate(Node x) {
+        y = x.right                         
+        gama = y.right 
+        beta = y.left **
+        alpha = x.left 
+        parent = x.parent 
+        isLeft = (x == parent.left)
+        //rotation
+        y.left = x
+        x.parent = y
 
+        x.right = beta 
+        beta.parent = x
+
+        y.parent = parent         
+        
+        if parent == null: root = y
+        else if isLeft: x.parent.left = y
+        else: x.parent.right = y 
+    }
+       y
+      / \
+     x   γ
+    / \
+   α   β
+   ==>
+       x
+      / \
+     α   y
+        / \
+       β   γ   
+    private void rightRotate(Node y) {
+        x = y.left 
+        alpha = x.left 
+        beta = x.right **
+        gama = y.right 
+        parent = y.parent 
+        isLeft = (y == parent.left)
+        //rotaion 
+        x.right = y 
+        y.parent = x 
+
+        y.left = beta 
+        beta.parent = y 
+
+        x.parent = parent 
+        if isLeft: parent.left = x 
+        else parent.right = x 
+    }
         AVL Tree Notes (Detailed)
 
 Trie Notes:
@@ -3086,3 +3146,3300 @@ B-Tree - Operations
         - B-Trees are balanced, multi-way search trees optimized for disk and large block storage.
         - They minimize disk I/O by maximizing the number of keys per node.
         - Used extensively in database and filesystem implementations.
+
+//11/7/25 (Day-17 github)//
+# Dijkstra's Algorithm - Complete Study Notes
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Problem Statement](#problem-statement)
+3. [Algorithm Overview](#algorithm-overview)
+4. [Step-by-Step Process](#step-by-step-process)
+5. [Implementation](#implementation)
+6. [Time & Space Complexity](#time--space-complexity)
+7. [Examples](#examples)
+8. [Applications](#applications)
+9. [Advantages & Disadvantages](#advantages--disadvantages)
+10. [Variations](#variations)
+11. [Practice Problems](#practice-problems)
+
+## Introduction
+I
+**Dijkstra's Algorithm** is a graph search algorithm that finds the shortest path between nodes in a weighted graph. It was conceived by computer scientist Edsger W. Dijkstra in 1956 and published three years later.
+
+### Key Characteristics:
+- **Greedy Algorithm**: Makes locally optimal choices at each step
+- **Single-Source Shortest Path**: Finds shortest paths from one source to all other vertices
+- **Works with**: Non-negative weighted graphs only
+- **Graph Type**: Works with both directed and undirected graphs
+
+## Problem Statement
+
+Given a weighted graph and a source vertex, find the shortest distance from the source to all other vertices in the graph.
+
+### Constraints:
+- All edge weights must be **non-negative**
+- Graph can be directed or undirected
+- Graph must be connected (for meaningful results)
+
+## Algorithm Overview
+
+### Core Idea:
+1. Start from the source vertex
+2. Maintain distances to all vertices (initially infinity except source = 0)
+3. Always select the unvisited vertex with minimum distance
+4. Update distances of its neighbors if a shorter path is found
+5. Mark the vertex as visited
+6. Repeat until all vertices are processed
+
+### Data Structures Used:
+- **Distance Array**: Stores shortest distance from source to each vertex
+- **Visited Array**: Tracks which vertices have been processed
+- **Priority Queue/Min-Heap**: Efficiently gets the vertex with minimum distance
+
+## Step-by-Step Process
+
+### Algorithm Steps:
+
+1. **Initialize**:
+   - Set distance to source = 0
+   - Set distance to all other vertices = ∞
+   - Mark all vertices as unvisited
+   - Create a priority queue with all vertices
+
+2. **Main Loop**:
+   ```
+   While there are unvisited vertices:
+       a. Select unvisited vertex 'u' with minimum distance
+       b. Mark 'u' as visited
+       c. For each unvisited neighbor 'v' of 'u':
+          - Calculate new_distance = distance[u] + weight(u,v)
+          - If new_distance < distance[v]:
+              distance[v] = new_distance
+              parent[v] = u  (for path reconstruction)
+   ```
+
+3. **Result**: Distance array contains shortest distances from source to all vertices
+
+## Implementation
+
+### Python Implementation (Using Priority Queue):
+
+```python
+import heapq
+from collections import defaultdict
+
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(list)
+        self.vertices = 0
+    
+    def add_edge(self, u, v, weight):
+        self.graph[u].append((v, weight))
+        self.vertices = max(self.vertices, max(u, v) + 1)
+    
+    def dijkstra(self, source):
+        # Initialize distances and visited array
+        distances = [float('inf')] * self.vertices
+        distances[source] = 0
+        visited = [False] * self.vertices
+        parent = [-1] * self.vertices
+        
+        # Priority queue: (distance, vertex)
+        pq = [(0, source)]
+        
+        while pq:
+            current_dist, u = heapq.heappop(pq)
+            
+            # Skip if already visited
+            if visited[u]:
+                continue
+                
+            visited[u] = True
+            
+            # Check all neighbors
+            for neighbor, weight in self.graph[u]:
+                if not visited[neighbor]:
+                    new_distance = current_dist + weight
+                    
+                    if new_distance < distances[neighbor]:
+                        distances[neighbor] = new_distance
+                        parent[neighbor] = u
+                        heapq.heappush(pq, (new_distance, neighbor))
+        
+        return distances, parent
+    
+    def get_shortest_path(self, source, target, parent):
+        path = []
+        current = target
+        
+        while current != -1:
+            path.append(current)
+            current = parent[current]
+        
+        path.reverse()
+        return path if path[0] == source else []
+
+# Example Usage
+g = Graph()
+g.add_edge(0, 1, 4)
+g.add_edge(0, 2, 1)
+g.add_edge(2, 1, 2)
+g.add_edge(1, 3, 1)
+g.add_edge(2, 3, 5)
+
+distances, parent = g.dijkstra(0)
+print("Shortest distances from vertex 0:", distances)
+print("Shortest path from 0 to 3:", g.get_shortest_path(0, 3, parent))
+```
+
+### C++ Implementation:
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+using namespace std;
+
+class Graph {
+    int V;
+    vector<vector<pair<int, int>>> adj;
+
+public:
+    Graph(int vertices) : V(vertices) {
+        adj.resize(V);
+    }
+    
+    void addEdge(int u, int v, int weight) {
+        adj[u].push_back({v, weight});
+    }
+    
+    vector<int> dijkstra(int source) {
+        vector<int> dist(V, INT_MAX);
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+        
+        dist[source] = 0;
+        pq.push({0, source});
+        
+        while (!pq.empty()) {
+            int u = pq.top().second;
+            pq.pop();
+            
+            for (auto& edge : adj[u]) {
+                int v = edge.first;
+                int weight = edge.second;
+                
+                if (dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                    pq.push({dist[v], v});
+                }
+            }
+        }
+        
+        return dist;
+    }
+};
+```
+
+## Time & Space Complexity
+
+### Time Complexity:
+- **Using Array**: O(V²) where V = number of vertices
+- **Using Binary Heap**: O((V + E) log V) where E = number of edges
+- **Using Fibonacci Heap**: O(E + V log V)
+
+### Space Complexity:
+- **O(V)** for distance array, visited array, and priority queue
+
+### When to use which implementation:
+- **Dense graphs** (E ≈ V²): Array implementation is better
+- **Sparse graphs** (E << V²): Heap implementation is better
+
+## Examples
+
+### Example 1: Simple Graph
+
+```
+Graph:
+    0 ----4---- 1
+    |          /|
+    1        2  |
+    |      /    1
+    2 ---5----- 3
+
+Source: 0
+```
+
+**Step-by-step execution:**
+
+| Step | Current | Distance Array | Visited | Action |
+|------|---------|----------------|---------|--------|
+| 0    | -       | [0, ∞, ∞, ∞]  | [F,F,F,F] | Initialize |
+| 1    | 0       | [0, 4, 1, ∞]  | [T,F,F,F] | Process vertex 0 |
+| 2    | 2       | [0, 3, 1, 6]  | [T,F,T,F] | Process vertex 2 |
+| 3    | 1       | [0, 3, 1, 4]  | [T,T,T,F] | Process vertex 1 |
+| 4    | 3       | [0, 3, 1, 4]  | [T,T,T,T] | Process vertex 3 |
+
+**Final Result:**
+- Distance from 0 to 0: 0
+- Distance from 0 to 1: 3 (path: 0→2→1)
+- Distance from 0 to 2: 1 (path: 0→2)
+- Distance from 0 to 3: 4 (path: 0→2→1→3)
+
+### Example 2: Larger Graph
+
+```
+       2
+   0 -----> 1
+   |      /   \
+   |     /     \ 4
+   6   1        \
+   |  /          v
+   v/            3
+   2 ----3-----> 4
+```
+
+**Adjacency representation:**
+- 0 → [(1,2), (2,6)]
+- 1 → [(2,1), (3,4)]
+- 2 → [(4,3)]
+- 3 → [(4,1)]
+
+## Applications
+
+### 1. **Network Routing Protocols**
+- **OSPF (Open Shortest Path First)**: Used in IP networks
+- **IS-IS**: Intermediate System to Intermediate System protocol
+
+### 2. **GPS Navigation Systems**
+- Finding shortest route between locations
+- Traffic-aware routing
+
+### 3. **Social Networks**
+- Finding degrees of separation
+- Shortest connection path between users
+
+### 4. **Game Development**
+- AI pathfinding for NPCs
+- Optimal movement planning
+
+### 5. **Transportation Networks**
+- Flight connections with minimum cost
+- Public transport route planning
+
+### 6. **Supply Chain Optimization**
+- Shortest delivery routes
+- Cost minimization in logistics
+
+### 7. **Network Analysis**
+- Finding critical nodes
+- Analyzing network reliability
+
+## Advantages & Disadvantages
+
+### ✅ Advantages:
+1. **Optimal Solution**: Always finds the shortest path
+2. **Versatile**: Works with various graph types
+3. **Well-studied**: Mature algorithm with many optimizations
+4. **Practical**: Widely applicable in real-world scenarios
+
+### ❌ Disadvantages:
+1. **Non-negative weights only**: Cannot handle negative edge weights
+2. **Single-source**: Needs to run multiple times for all-pairs shortest paths
+3. **Memory intensive**: Requires storing all distances
+4. **Not suitable for dynamic graphs**: Needs recomputation when graph changes
+
+## Variations
+
+### 1. **Bidirectional Dijkstra**
+- Run Dijkstra from both source and target
+- Stop when the searches meet
+- Often faster for single source-target queries
+
+### 2. **A* Algorithm**
+- Uses heuristic function to guide search
+- More efficient for specific target finding
+- Guarantees optimal path if heuristic is admissible
+
+### 3. **Dijkstra with Path Compression**
+- Optimized for repeated queries
+- Preprocesses graph for faster subsequent searches
+
+### 4. **Multi-source Dijkstra**
+- Starts from multiple sources simultaneously
+- Useful for facility location problems
+
+## Important Notes & Tips
+
+### 🚨 Common Pitfalls:
+1. **Negative weights**: Dijkstra fails with negative edge weights (use Bellman-Ford instead)
+2. **Infinite loops**: Can occur if implementation doesn't properly handle visited vertices
+3. **Integer overflow**: Use appropriate data types for large weights
+4. **Zero-weight cycles**: While allowed, need careful handling
+
+### 💡 Optimization Tips:
+1. **Early termination**: Stop when target vertex is reached (for single target)
+2. **Preprocessing**: Sort adjacency lists by weight for better cache performance
+3. **Data structure choice**: Use Fibonacci heap for very sparse graphs
+4. **Memory optimization**: Use bit arrays for visited flags
+
+### 🔍 Debugging Tips:
+1. Print distance array at each step
+2. Verify graph representation
+3. Check for negative weights
+4. Ensure proper priority queue usage
+
+## Practice Problems
+
+### Beginner Level:
+1. **Shortest Path in Binary Maze** (LeetCode 1091)
+2. **Network Delay Time** (LeetCode 743)
+3. **Cheapest Flights Within K Stops** (LeetCode 787)
+
+### Intermediate Level:
+1. **Path with Maximum Probability** (LeetCode 1514)
+2. **Swim in Rising Water** (LeetCode 778)
+3. **Minimum Cost to Make Array Non-decreasing** (Custom)
+
+### Advanced Level:
+1. **Shortest Path Visiting All Nodes** (LeetCode 847)
+2. **Minimum Cost to Reach Destination in Time** (LeetCode 1928)
+3. **Find the City With the Smallest Number of Neighbors** (LeetCode 1334)
+
+## Related Algorithms
+
+### Comparison with other shortest path algorithms:
+
+| Algorithm | Use Case | Time Complexity | Handles Negative Weights |
+|-----------|----------|----------------|-------------------------|
+| Dijkstra | Single-source, non-negative weights | O(E + V log V) | ❌ |
+| Bellman-Ford | Single-source, any weights | O(VE) | ✅ |
+| Floyd-Warshall | All-pairs shortest paths | O(V³) | ✅ |
+| A* | Single target with heuristic | O(E) | ❌ |
+
+## Summary
+
+Dijkstra's algorithm is a fundamental and highly practical algorithm for finding shortest paths in weighted graphs. Its greedy approach and optimal substructure make it both efficient and reliable for graphs with non-negative weights. Understanding this algorithm is crucial for:
+
+- **Competitive Programming**: Many problems involve shortest path calculations
+- **System Design**: Network routing and optimization problems
+- **Interview Preparation**: Commonly asked in technical interviews
+- **Real-world Applications**: GPS, networking, game development
+
+Master the implementation, understand the complexity trade-offs, and practice with various problem types to become proficient with this essential algorithm.
+
+---
+
+*Remember: Practice implementing Dijkstra's algorithm multiple times until you can write it from memory. Understanding the intuition behind the greedy choice is as important as memorizing the code.*
+
+# Bellman-Ford Algorithm - Complete Study Notes
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Problem Statement](#problem-statement)
+3. [Algorithm Overview](#algorithm-overview)
+4. [Step-by-Step Process](#step-by-step-process)
+5. [Implementation](#implementation)
+6. [Time & Space Complexity](#time--space-complexity)
+7. [Examples](#examples)
+8. [Negative Cycle Detection](#negative-cycle-detection)
+9. [Applications](#applications)
+10. [Advantages & Disadvantages](#advantages--disadvantages)
+11. [Comparison with Dijkstra](#comparison-with-dijkstra)
+12. [Variations](#variations)
+13. [Practice Problems](#practice-problems)
+
+## Introduction
+
+**Bellman-Ford Algorithm** is a single-source shortest path algorithm that can handle graphs with negative edge weights. It was developed by Richard Bellman and Lester Ford Jr. in the 1950s.
+
+### Key Characteristics:
+- **Dynamic Programming**: Uses optimal substructure and overlapping subproblems
+- **Single-Source Shortest Path**: Finds shortest paths from one source to all other vertices
+- **Handles Negative Weights**: Works with negative edge weights (unlike Dijkstra)
+- **Negative Cycle Detection**: Can detect negative cycles in the graph
+- **Graph Type**: Works with both directed and undirected graphs
+
+## Problem Statement
+
+Given a weighted graph and a source vertex, find the shortest distance from the source to all other vertices. Additionally, detect if there are any negative cycles reachable from the source.
+
+### Constraints:
+- Graph can have **negative edge weights**
+- Graph can be directed or undirected
+- Must detect negative cycles (paths where total weight < 0)
+
+## Algorithm Overview
+
+### Core Idea:
+1. Initialize distances to all vertices as infinity (except source = 0)
+2. **Relax all edges** repeatedly for (V-1) iterations
+3. Check for negative cycles by doing one more iteration
+4. If any distance can still be improved, there's a negative cycle
+
+### Key Concept - Edge Relaxation:
+For edge (u, v) with weight w:
+```
+if distance[u] + w < distance[v]:
+    distance[v] = distance[u] + w
+    parent[v] = u
+```
+
+### Why (V-1) iterations?
+- Shortest path can have at most (V-1) edges
+- Each iteration can extend the shortest path by one edge
+- After (V-1) iterations, all shortest paths are found
+
+## Step-by-Step Process
+
+### Algorithm Steps:
+
+1. **Initialize**:
+   - Set distance to source = 0
+   - Set distance to all other vertices = ∞
+   - Set parent of all vertices = -1
+
+2. **Main Loop** (Repeat V-1 times):
+   ```
+   For i = 1 to V-1:
+       For each edge (u, v) with weight w:
+           if distance[u] ≠ ∞ AND distance[u] + w < distance[v]:
+               distance[v] = distance[u] + w
+               parent[v] = u
+   ```
+
+3. **Negative Cycle Check**:
+   ```
+   For each edge (u, v) with weight w:
+       if distance[u] ≠ ∞ AND distance[u] + w < distance[v]:
+           return "Negative cycle detected"
+   ```
+
+4. **Result**: Distance array contains shortest distances (or negative cycle detected)
+
+## Implementation
+
+### Python Implementation:
+
+```python
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.edges = []
+    
+    def add_edge(self, u, v, weight):
+        self.edges.append((u, v, weight))
+    
+    def bellman_ford(self, source):
+        # Step 1: Initialize distances
+        distances = [float('inf')] * self.V
+        distances[source] = 0
+        parent = [-1] * self.V
+        
+        # Step 2: Relax all edges V-1 times
+        for i in range(self.V - 1):
+            # Flag to check if any distance was updated
+            updated = False
+            
+            for u, v, weight in self.edges:
+                if distances[u] != float('inf') and distances[u] + weight < distances[v]:
+                    distances[v] = distances[u] + weight
+                    parent[v] = u
+                    updated = True
+            
+            # Early termination optimization
+            if not updated:
+                break
+        
+        # Step 3: Check for negative cycles
+        for u, v, weight in self.edges:
+            if distances[u] != float('inf') and distances[u] + weight < distances[v]:
+                return None, None, "Negative cycle detected"
+        
+        return distances, parent, "No negative cycle"
+    
+    def get_shortest_path(self, source, target, parent):
+        if parent[target] == -1 and target != source:
+            return []
+        
+        path = []
+        current = target
+        
+        while current != -1:
+            path.append(current)
+            current = parent[current]
+        
+        path.reverse()
+        return path
+    
+    def print_solution(self, distances, parent, source):
+        print(f"Shortest distances from vertex {source}:")
+        for i in range(self.V):
+            if distances[i] == float('inf'):
+                print(f"Vertex {i}: No path")
+            else:
+                path = self.get_shortest_path(source, i, parent)
+                print(f"Vertex {i}: Distance = {distances[i]}, Path = {' -> '.join(map(str, path))}")
+
+# Example Usage
+g = Graph(5)
+g.add_edge(0, 1, -1)
+g.add_edge(0, 2, 4)
+g.add_edge(1, 2, 3)
+g.add_edge(1, 3, 2)
+g.add_edge(1, 4, 2)
+g.add_edge(3, 2, 5)
+g.add_edge(3, 1, 1)
+g.add_edge(4, 3, -3)
+
+distances, parent, status = g.bellman_ford(0)
+if distances:
+    g.print_solution(distances, parent, 0)
+else:
+    print(status)
+```
+
+### C++ Implementation:
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <climits>
+using namespace std;
+
+struct Edge {
+    int u, v, weight;
+    Edge(int u, int v, int weight) : u(u), v(v), weight(weight) {}
+};
+
+class Graph {
+    int V;
+    vector<Edge> edges;
+
+public:
+    Graph(int vertices) : V(vertices) {}
+    
+    void addEdge(int u, int v, int weight) {
+        edges.push_back(Edge(u, v, weight));
+    }
+    
+    pair<vector<int>, bool> bellmanFord(int source) {
+        vector<int> dist(V, INT_MAX);
+        dist[source] = 0;
+        
+        // Relax all edges V-1 times
+        for (int i = 0; i < V - 1; i++) {
+            for (auto& edge : edges) {
+                if (dist[edge.u] != INT_MAX && 
+                    dist[edge.u] + edge.weight < dist[edge.v]) {
+                    dist[edge.v] = dist[edge.u] + edge.weight;
+                }
+            }
+        }
+        
+        // Check for negative cycles
+        for (auto& edge : edges) {
+            if (dist[edge.u] != INT_MAX && 
+                dist[edge.u] + edge.weight < dist[edge.v]) {
+                return {dist, false}; // Negative cycle detected
+            }
+        }
+        
+        return {dist, true}; // No negative cycle
+    }
+};
+```
+
+### Optimized Version with Early Termination:
+
+```python
+def bellman_ford_optimized(self, source):
+    distances = [float('inf')] * self.V
+    distances[source] = 0
+    
+    for iteration in range(self.V - 1):
+        updated = False
+        
+        for u, v, weight in self.edges:
+            if distances[u] != float('inf') and distances[u] + weight < distances[v]:
+                distances[v] = distances[u] + weight
+                updated = True
+        
+        # If no updates in this iteration, we're done
+        if not updated:
+            print(f"Converged after {iteration + 1} iterations")
+            break
+    
+    # Check for negative cycles
+    for u, v, weight in self.edges:
+        if distances[u] != float('inf') and distances[u] + weight < distances[v]:
+            return None, "Negative cycle detected"
+    
+    return distances, "No negative cycle"
+```
+
+## Time & Space Complexity
+
+### Time Complexity:
+- **Worst Case**: O(V × E) where V = vertices, E = edges
+- **Best Case**: O(E) with early termination optimization
+- **Average Case**: O(V × E)
+
+### Space Complexity:
+- **O(V)** for distance and parent arrays
+- **O(E)** for storing edges
+
+### Comparison:
+- **Dense graphs** (E ≈ V²): O(V³)
+- **Sparse graphs** (E ≈ V): O(V²)
+
+## Examples
+
+### Example 1: Graph with Negative Edges
+
+```
+Graph:
+    0 ----(-1)---- 1
+    |              |
+    4             2
+    |           /   |
+    2 ---(3)--- 2   2
+           |        |
+           (5)      4
+           |      /
+           3 --(-3)
+
+Edges: (0,1,-1), (0,2,4), (1,2,3), (1,3,2), (1,4,2), (3,2,5), (3,1,1), (4,3,-3)
+Source: 0
+```
+
+**Step-by-step execution:**
+
+| Iteration | Edge Relaxed | Distance Array | Updated |
+|-----------|--------------|----------------|---------|
+| 0         | -            | [0, ∞, ∞, ∞, ∞] | - |
+| 1         | (0,1,-1)     | [0, -1, ∞, ∞, ∞] | Yes |
+| 1         | (0,2,4)      | [0, -1, 4, ∞, ∞] | Yes |
+| 1         | (1,2,3)      | [0, -1, 2, ∞, ∞] | Yes |
+| 1         | (1,3,2)      | [0, -1, 2, 1, ∞] | Yes |
+| 1         | (1,4,2)      | [0, -1, 2, 1, 1] | Yes |
+| 2         | (4,3,-3)     | [0, -1, 2, -2, 1] | Yes |
+| 2         | (3,1,1)      | [0, -1, 2, -2, 1] | No |
+| 3         | No updates   | [0, -1, 2, -2, 1] | No |
+
+**Final Result:**
+- Distance from 0 to 0: 0
+- Distance from 0 to 1: -1 (path: 0→1)
+- Distance from 0 to 2: 2 (path: 0→1→2)
+- Distance from 0 to 3: -2 (path: 0→1→4→3)
+- Distance from 0 to 4: 1 (path: 0→1→4)
+
+### Example 2: Graph with Negative Cycle
+
+```
+Graph with negative cycle:
+    0 ----1---- 1
+              / |
+            -3  2
+           /    |
+          2 ----1---- 3
+
+Edges: (0,1,1), (1,2,2), (2,1,-3), (1,3,1), (2,3,1)
+```
+
+The cycle 1→2→1 has weight: 2 + (-3) = -1 (negative cycle)
+
+## Negative Cycle Detection
+
+### Why is Negative Cycle Detection Important?
+
+1. **Shortest Path Undefined**: In presence of negative cycles, shortest path is not well-defined
+2. **Infinite Improvement**: Distances can be improved indefinitely
+3. **Real-world Applications**: Arbitrage detection in finance, finding inconsistencies
+
+### Detection Method:
+
+After V-1 iterations, if we can still relax any edge, there's a negative cycle:
+
+```python
+def detect_negative_cycle(self, source):
+    distances, _, status = self.bellman_ford(source)
+    
+    if distances is None:
+        return True  # Negative cycle detected
+    
+    return False
+
+def find_negative_cycle_vertices(self, source):
+    distances = [float('inf')] * self.V
+    distances[source] = 0
+    
+    # Run V-1 iterations
+    for _ in range(self.V - 1):
+        for u, v, weight in self.edges:
+            if distances[u] != float('inf') and distances[u] + weight < distances[v]:
+                distances[v] = distances[u] + weight
+    
+    # Find vertices affected by negative cycle
+    cycle_vertices = set()
+    for u, v, weight in self.edges:
+        if distances[u] != float('inf') and distances[u] + weight < distances[v]:
+            cycle_vertices.add(v)
+    
+    return list(cycle_vertices)
+```
+
+## Applications
+
+### 1. **Finance - Arbitrage Detection**
+- Currency exchange rates
+- Finding profitable trading cycles
+- Risk assessment in financial markets
+
+### 2. **Network Routing**
+- Handling negative costs (discounts, incentives)
+- Network optimization with penalties
+
+### 3. **Game Theory**
+- Finding optimal strategies with penalties
+- Economic modeling
+
+### 4. **Transportation Networks**
+- Routes with tolls and subsidies
+- Multi-modal transportation optimization
+
+### 5. **Supply Chain Management**
+- Cost optimization with rebates
+- Inventory management with penalties
+
+### 6. **Social Networks**
+- Influence propagation with negative effects
+- Trust and reputation systems
+
+## Advantages & Disadvantages
+
+### ✅ Advantages:
+1. **Handles Negative Weights**: Can process graphs with negative edge weights
+2. **Negative Cycle Detection**: Can identify and report negative cycles
+3. **Simplicity**: Easy to understand and implement
+4. **Versatility**: Works with any graph structure
+5. **Guaranteed Convergence**: Always terminates with correct answer
+
+### ❌ Disadvantages:
+1. **Slower than Dijkstra**: O(VE) vs O((V+E)logV) for non-negative weights
+2. **Not suitable for large graphs**: Cubic time complexity for dense graphs
+3. **Single-source only**: Need multiple runs for all-pairs shortest paths
+4. **No early termination guarantee**: May need full V-1 iterations
+
+## Comparison with Dijkstra
+
+| Aspect | Dijkstra | Bellman-Ford |
+|--------|----------|--------------|
+| **Time Complexity** | O((V+E)logV) | O(VE) |
+| **Negative Weights** | ❌ No | ✅ Yes |
+| **Negative Cycle Detection** | ❌ No | ✅ Yes |
+| **Graph Type** | Weighted, non-negative | Weighted, any weights |
+| **Algorithm Type** | Greedy | Dynamic Programming |
+| **Memory Usage** | O(V) | O(V) |
+| **Use Case** | Fast shortest path | Negative weights, cycle detection |
+
+### When to Use Which:
+
+**Use Dijkstra when:**
+- All edge weights are non-negative
+- Performance is critical
+- Large graphs with many vertices
+
+**Use Bellman-Ford when:**
+- Graph has negative edge weights
+- Need to detect negative cycles
+- Graph is relatively small
+- Robustness is more important than speed
+
+## Variations
+
+### 1. **SPFA (Shortest Path Faster Algorithm)**
+- Optimization of Bellman-Ford using queue
+- Average case: O(E), Worst case: O(VE)
+- More efficient in practice
+
+```python
+def spfa(self, source):
+    distances = [float('inf')] * self.V
+    distances[source] = 0
+    in_queue = [False] * self.V
+    queue = [source]
+    in_queue[source] = True
+    
+    while queue:
+        u = queue.pop(0)
+        in_queue[u] = False
+        
+        for v, weight in self.adj[u]:
+            if distances[u] + weight < distances[v]:
+                distances[v] = distances[u] + weight
+                if not in_queue[v]:
+                    queue.append(v)
+                    in_queue[v] = True
+    
+    return distances
+```
+
+### 2. **Yen's Algorithm**
+- For finding K shortest paths
+- Combines Dijkstra and path deviation
+
+### 3. **Eppstein's Algorithm**
+- K shortest paths in O(E + V log V + K)
+- More efficient for multiple path queries
+
+## Important Notes & Tips
+
+### 🚨 Common Pitfalls:
+1. **Integer Overflow**: Use appropriate data types for large weights
+2. **Unreachable Vertices**: Check for infinity distances
+3. **Negative Cycle Handling**: Decide how to handle negative cycles
+4. **Graph Representation**: Ensure all edges are properly stored
+
+### 💡 Optimization Tips:
+1. **Early Termination**: Stop if no updates in an iteration
+2. **Queue-based Approach**: Use SPFA for better average performance
+3. **Parallel Processing**: Relax edges in parallel
+4. **Memory Optimization**: Use efficient data structures
+
+### 🔍 Debugging Tips:
+1. Print distances after each iteration
+2. Verify edge list is complete
+3. Check for proper initialization
+4. Test with known examples
+
+## Practice Problems
+
+### Beginner Level:
+1. **Single Source Shortest Path** (Basic implementation)
+2. **Detect Negative Cycle** (GeeksforGeeks)
+3. **Distance from Source** (HackerRank)
+
+### Intermediate Level:
+1. **Cheapest Flights Within K Stops** (LeetCode 787) - Modified Bellman-Ford
+2. **Network Delay Time with Negative Edges** (Custom)
+3. **Currency Exchange** (UVa 10557)
+
+### Advanced Level:
+1. **Time Travel** (Codeforces)
+2. **Wormholes** (USACO)
+3. **Arbitrage** (Programming Challenges)
+
+## Summary
+
+Bellman-Ford algorithm is essential for handling graphs with negative edge weights and detecting negative cycles. While slower than Dijkstra's algorithm, it provides crucial functionality that Dijkstra cannot handle.
+
+### Key Takeaways:
+- **Complementary to Dijkstra**: Use when negative weights are present
+- **Reliable**: Always finds correct shortest paths or detects negative cycles
+- **Practical Applications**: Finance, economics, network optimization
+- **Implementation**: Straightforward dynamic programming approach
+
+### Master Bellman-Ford by:
+1. Understanding the relaxation concept
+2. Practicing implementation from scratch
+3. Solving problems with negative weights
+4. Learning to detect and handle negative cycles
+
+---
+
+*Remember: Bellman-Ford is about patience over speed - it methodically explores all possibilities to guarantee correctness even with negative weights.*
+
+# Topological Sorting - Complete Study Notes
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Problem Statement](#problem-statement)
+3. [Prerequisites & Concepts](#prerequisites--concepts)
+4. [Algorithm Approaches](#algorithm-approaches)
+5. [DFS-Based Implementation](#dfs-based-implementation)
+6. [Kahn's Algorithm (BFS-Based)](#kahns-algorithm-bfs-based)
+7. [Time & Space Complexity](#time--space-complexity)
+8. [Examples](#examples)
+9. [Applications](#applications)
+10. [Cycle Detection](#cycle-detection)
+11. [Variations](#variations)
+12. [Common Problems](#common-problems)
+13. [Practice Problems](#practice-problems)
+
+## Introduction
+
+**Topological Sorting** is a linear ordering of vertices in a Directed Acyclic Graph (DAG) such that for every directed edge (u, v), vertex u comes before vertex v in the ordering.
+
+### Key Characteristics:
+- **Only for DAGs**: Works only on Directed Acyclic Graphs
+- **Linear Ordering**: Produces a sequence of vertices
+- **Dependency Resolution**: Respects all dependency relationships
+- **Multiple Solutions**: A DAG can have multiple valid topological sorts
+- **Cycle Detection**: Can detect cycles in directed graphs
+
+### Real-World Analogy:
+Think of it like **task scheduling** where some tasks must be completed before others:
+- Getting dressed: underwear → pants → shoes
+- Course prerequisites: Math 101 → Math 201 → Math 301
+- Build dependencies: compile libraries → link → execute
+
+## Problem Statement
+
+Given a directed acyclic graph (DAG), find a linear ordering of its vertices such that for every directed edge (u, v), vertex u appears before vertex v in the ordering.
+
+### Constraints:
+- Graph must be **directed**
+- Graph must be **acyclic** (no cycles)
+- If cycles exist, topological sorting is not possible
+
+## Prerequisites & Concepts
+
+### 1. **Directed Acyclic Graph (DAG)**
+```
+Valid DAG:
+A → B → D
+↓   ↓
+C → E
+
+Invalid (has cycle):
+A → B
+↑   ↓
+D ← C
+```
+
+### 2. **In-degree and Out-degree**
+- **In-degree**: Number of incoming edges to a vertex
+- **Out-degree**: Number of outgoing edges from a vertex
+
+### 3. **Dependency Relationship**
+- If there's an edge u → v, then u must come before v
+- u is a **prerequisite** for v
+- v **depends on** u
+
+## Algorithm Approaches
+
+There are two main approaches for topological sorting:
+
+### 1. **DFS-Based Approach**
+- Use Depth-First Search
+- Finish times determine the order
+- Vertices are added to result in reverse finish order
+
+### 2. **Kahn's Algorithm (BFS-Based)**
+- Use in-degree counting
+- Process vertices with zero in-degree first
+- Remove processed vertices and update in-degrees
+
+## DFS-Based Implementation
+
+### Algorithm Steps:
+1. Perform DFS on all unvisited vertices
+2. When finishing a vertex (all neighbors processed), add it to the front of result
+3. The result will be in topologically sorted order
+
+### Python Implementation:
+
+```python
+from collections import defaultdict
+
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = defaultdict(list)
+    
+    def add_edge(self, u, v):
+        self.graph[u].append(v)
+    
+    def topological_sort_dfs(self):
+        visited = [False] * self.V
+        stack = []
+        
+        # Call DFS for all unvisited vertices
+        for vertex in range(self.V):
+            if not visited[vertex]:
+                self._dfs_util(vertex, visited, stack)
+        
+        return stack[::-1]  # Reverse to get correct order
+    
+    def _dfs_util(self, vertex, visited, stack):
+        visited[vertex] = True
+        
+        # Visit all neighbors
+        for neighbor in self.graph[vertex]:
+            if not visited[neighbor]:
+                self._dfs_util(neighbor, visited, stack)
+        
+        # Add to stack after visiting all neighbors
+        stack.append(vertex)
+    
+    def topological_sort_with_cycle_detection(self):
+        WHITE, GRAY, BLACK = 0, 1, 2
+        color = [WHITE] * self.V
+        result = []
+        
+        def dfs(vertex):
+            if color[vertex] == GRAY:
+                return False  # Cycle detected
+            if color[vertex] == BLACK:
+                return True   # Already processed
+            
+            color[vertex] = GRAY  # Mark as being processed
+            
+            for neighbor in self.graph[vertex]:
+                if not dfs(neighbor):
+                    return False
+            
+            color[vertex] = BLACK  # Mark as completely processed
+            result.append(vertex)
+            return True
+        
+        # Process all vertices
+        for vertex in range(self.V):
+            if color[vertex] == WHITE:
+                if not dfs(vertex):
+                    return None, "Cycle detected"
+        
+        return result[::-1], "No cycle"
+
+# Example Usage
+g = Graph(6)
+g.add_edge(5, 2)
+g.add_edge(5, 0)
+g.add_edge(4, 0)
+g.add_edge(4, 1)
+g.add_edge(2, 3)
+g.add_edge(3, 1)
+
+print("DFS-based Topological Sort:", g.topological_sort_dfs())
+```
+
+### C++ Implementation:
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <algorithm>
+using namespace std;
+
+class Graph {
+    int V;
+    vector<vector<int>> adj;
+
+public:
+    Graph(int vertices) : V(vertices) {
+        adj.resize(V);
+    }
+    
+    void addEdge(int u, int v) {
+        adj[u].push_back(v);
+    }
+    
+    void dfsUtil(int vertex, vector<bool>& visited, stack<int>& result) {
+        visited[vertex] = true;
+        
+        for (int neighbor : adj[vertex]) {
+            if (!visited[neighbor]) {
+                dfsUtil(neighbor, visited, result);
+            }
+        }
+        
+        result.push(vertex);
+    }
+    
+    vector<int> topologicalSort() {
+        stack<int> result;
+        vector<bool> visited(V, false);
+        
+        for (int i = 0; i < V; i++) {
+            if (!visited[i]) {
+                dfsUtil(i, visited, result);
+            }
+        }
+        
+        vector<int> topOrder;
+        while (!result.empty()) {
+            topOrder.push_back(result.top());
+            result.pop();
+        }
+        
+        return topOrder;
+    }
+};
+```
+
+## Kahn's Algorithm (BFS-Based)
+
+### Algorithm Steps:
+1. Calculate in-degree for all vertices
+2. Add all vertices with in-degree 0 to a queue
+3. While queue is not empty:
+   - Remove a vertex from queue and add to result
+   - For each neighbor, decrease its in-degree by 1
+   - If neighbor's in-degree becomes 0, add it to queue
+4. If result contains all vertices, return it; otherwise, cycle exists
+
+### Python Implementation:
+
+```python
+from collections import deque, defaultdict
+
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = defaultdict(list)
+    
+    def add_edge(self, u, v):
+        self.graph[u].append(v)
+    
+    def topological_sort_kahn(self):
+        # Calculate in-degrees
+        in_degree = [0] * self.V
+        for vertex in range(self.V):
+            for neighbor in self.graph[vertex]:
+                in_degree[neighbor] += 1
+        
+        # Initialize queue with vertices having 0 in-degree
+        queue = deque()
+        for vertex in range(self.V):
+            if in_degree[vertex] == 0:
+                queue.append(vertex)
+        
+        result = []
+        
+        while queue:
+            vertex = queue.popleft()
+            result.append(vertex)
+            
+            # Update in-degrees of neighbors
+            for neighbor in self.graph[vertex]:
+                in_degree[neighbor] -= 1
+                if in_degree[neighbor] == 0:
+                    queue.append(neighbor)
+        
+        # Check for cycles
+        if len(result) != self.V:
+            return None, "Cycle detected"
+        
+        return result, "No cycle"
+    
+    def all_topological_sorts(self):
+        in_degree = [0] * self.V
+        for vertex in range(self.V):
+            for neighbor in self.graph[vertex]:
+                in_degree[neighbor] += 1
+        
+        result = []
+        all_sorts = []
+        
+        def backtrack():
+            # Find vertices with 0 in-degree
+            available = []
+            for vertex in range(self.V):
+                if in_degree[vertex] == 0 and vertex not in result:
+                    available.append(vertex)
+            
+            if not available:
+                if len(result) == self.V:
+                    all_sorts.append(result[:])
+                return
+            
+            for vertex in available:
+                result.append(vertex)
+                
+                # Temporarily reduce in-degrees
+                temp_reduced = []
+                for neighbor in self.graph[vertex]:
+                    in_degree[neighbor] -= 1
+                    temp_reduced.append(neighbor)
+                
+                backtrack()
+                
+                # Restore in-degrees
+                for neighbor in temp_reduced:
+                    in_degree[neighbor] += 1
+                
+                result.pop()
+        
+        backtrack()
+        return all_sorts
+
+# Example Usage
+g = Graph(4)
+g.add_edge(0, 1)
+g.add_edge(0, 2)
+g.add_edge(1, 3)
+g.add_edge(2, 3)
+
+result, status = g.topological_sort_kahn()
+print(f"Kahn's Algorithm: {result}")
+print(f"Status: {status}")
+
+all_sorts = g.all_topological_sorts()
+print(f"All possible topological sorts: {all_sorts}")
+```
+
+## Time & Space Complexity
+
+### DFS-Based Approach:
+- **Time Complexity**: O(V + E)
+- **Space Complexity**: O(V) for recursion stack and visited array
+
+### Kahn's Algorithm:
+- **Time Complexity**: O(V + E)
+- **Space Complexity**: O(V) for in-degree array and queue
+
+### All Topological Sorts:
+- **Time Complexity**: O(V! × (V + E)) in worst case
+- **Space Complexity**: O(V)
+
+## Examples
+
+### Example 1: Course Prerequisites
+
+```
+Courses and Prerequisites:
+- Course 0: No prerequisites
+- Course 1: Requires Course 0
+- Course 2: Requires Course 0
+- Course 3: Requires Courses 1 and 2
+
+Graph representation:
+0 → 1 → 3
+↓     ↗
+2 ----
+```
+
+**Step-by-step Kahn's Algorithm:**
+
+| Step | Queue | Result | In-degrees | Action |
+|------|-------|--------|------------|--------|
+| 0    | [0]   | []     | [0,1,1,2]  | Initialize |
+| 1    | [1,2] | [0]    | [0,0,0,2]  | Process 0 |
+| 2    | [2]   | [0,1]  | [0,0,0,1]  | Process 1 |
+| 3    | [3]   | [0,1,2]| [0,0,0,0]  | Process 2 |
+| 4    | []    | [0,1,2,3]| [0,0,0,0] | Process 3 |
+
+**Valid topological orders:**
+- [0, 1, 2, 3]
+- [0, 2, 1, 3]
+
+### Example 2: Build Dependencies
+
+```
+Build system dependencies:
+A.cpp → A.o → program
+B.cpp → B.o ↗
+C.cpp → C.o ↗
+
+Graph:
+A.cpp → A.o ↘
+              program
+B.cpp → B.o ↗
+C.cpp → C.o ↗
+```
+
+**Possible build orders:**
+- [A.cpp, A.o, B.cpp, B.o, C.cpp, C.o, program]
+- [B.cpp, B.o, A.cpp, A.o, C.cpp, C.o, program]
+- And many other valid orderings...
+
+### Example 3: Cycle Detection
+
+```
+Graph with cycle:
+A → B → C
+↑       ↓
+D ←---- 
+
+This forms cycle: A → B → C → D → A
+Topological sorting is NOT possible.
+```
+
+## Applications
+
+### 1. **Task Scheduling**
+```python
+def schedule_tasks(tasks, dependencies):
+    g = Graph(len(tasks))
+    task_to_id = {task: i for i, task in enumerate(tasks)}
+    
+    for prereq, task in dependencies:
+        g.add_edge(task_to_id[prereq], task_to_id[task])
+    
+    order, status = g.topological_sort_kahn()
+    if order is None:
+        return "Cannot schedule - circular dependency"
+    
+    return [tasks[i] for i in order]
+
+# Example
+tasks = ["wake_up", "brush_teeth", "eat_breakfast", "go_to_work"]
+deps = [("wake_up", "brush_teeth"), ("brush_teeth", "eat_breakfast"), 
+        ("eat_breakfast", "go_to_work")]
+print(schedule_tasks(tasks, deps))
+```
+
+### 2. **Build Systems**
+- **Make**: Determines compilation order
+- **Maven/Gradle**: Dependency resolution
+- **npm/pip**: Package installation order
+
+### 3. **Course Planning**
+```python
+def plan_courses(courses, prerequisites):
+    # Implementation similar to task scheduling
+    # Returns optimal course taking order
+    pass
+```
+
+### 4. **Database Query Optimization**
+- Join order optimization
+- Dependency-based query execution
+
+### 5. **Spreadsheet Formula Evaluation**
+- Cell dependency resolution
+- Circular reference detection
+
+### 6. **Version Control Systems**
+- Commit ordering
+- Branch merge strategies
+
+## Cycle Detection
+
+### Why Cycles Matter:
+- **Deadlock**: Circular dependencies can cause deadlocks
+- **Infinite Loops**: Impossible to find a valid ordering
+- **Data Consistency**: Ensures acyclic dependencies
+
+### Detection Methods:
+
+#### 1. **Using DFS (3-Color Method)**
+```python
+def has_cycle_dfs(self):
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = [WHITE] * self.V
+    
+    def dfs(vertex):
+        if color[vertex] == GRAY:
+            return True  # Back edge found - cycle!
+        if color[vertex] == BLACK:
+            return False
+        
+        color[vertex] = GRAY
+        for neighbor in self.graph[vertex]:
+            if dfs(neighbor):
+                return True
+        color[vertex] = BLACK
+        return False
+    
+    for vertex in range(self.V):
+        if color[vertex] == WHITE:
+            if dfs(vertex):
+                return True
+    return False
+```
+
+#### 2. **Using Kahn's Algorithm**
+```python
+def has_cycle_kahn(self):
+    result, _ = self.topological_sort_kahn()
+    return result is None  # If None, cycle exists
+```
+
+## Variations
+
+### 1. **Lexicographically Smallest Topological Sort**
+```python
+def lexicographically_smallest_topological_sort(self):
+    import heapq
+    
+    in_degree = [0] * self.V
+    for vertex in range(self.V):
+        for neighbor in self.graph[vertex]:
+            in_degree[neighbor] += 1
+    
+    # Use min-heap instead of regular queue
+    heap = []
+    for vertex in range(self.V):
+        if in_degree[vertex] == 0:
+            heapq.heappush(heap, vertex)
+    
+    result = []
+    while heap:
+        vertex = heapq.heappop(heap)
+        result.append(vertex)
+        
+        for neighbor in self.graph[vertex]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                heapq.heappush(heap, neighbor)
+    
+    return result if len(result) == self.V else None
+```
+
+### 2. **Topological Sort with Parallel Processing**
+```python
+def parallel_topological_sort(self):
+    in_degree = [0] * self.V
+    for vertex in range(self.V):
+        for neighbor in self.graph[vertex]:
+            in_degree[neighbor] += 1
+    
+    levels = []
+    current_level = [v for v in range(self.V) if in_degree[v] == 0]
+    
+    while current_level:
+        levels.append(current_level[:])
+        next_level = []
+        
+        for vertex in current_level:
+            for neighbor in self.graph[vertex]:
+                in_degree[neighbor] -= 1
+                if in_degree[neighbor] == 0:
+                    next_level.append(neighbor)
+        
+        current_level = next_level
+    
+    return levels
+```
+
+## Common Problems
+
+### 1. **Course Schedule (LeetCode 207)**
+```python
+def can_finish(num_courses, prerequisites):
+    g = Graph(num_courses)
+    for course, prereq in prerequisites:
+        g.add_edge(prereq, course)
+    
+    _, status = g.topological_sort_kahn()
+    return status == "No cycle"
+```
+
+### 2. **Course Schedule II (LeetCode 210)**
+```python
+def find_order(num_courses, prerequisites):
+    g = Graph(num_courses)
+    for course, prereq in prerequisites:
+        g.add_edge(prereq, course)
+    
+    order, status = g.topological_sort_kahn()
+    return order if status == "No cycle" else []
+```
+
+### 3. **Alien Dictionary (LeetCode 269)**
+```python
+def alien_order(words):
+    # Build graph from word ordering
+    # Use topological sort to find character order
+    pass
+```
+
+## Practice Problems
+
+### Beginner Level:
+1. **Course Schedule** (LeetCode 207)
+2. **Course Schedule II** (LeetCode 210)
+3. **Minimum Height Trees** (LeetCode 310)
+
+### Intermediate Level:
+1. **Alien Dictionary** (LeetCode 269)
+2. **Sequence Reconstruction** (LeetCode 444)
+3. **Sort Items by Groups Respecting Dependencies** (LeetCode 1203)
+
+### Advanced Level:
+1. **Build Binary Expression Tree From Infix Expression** (LeetCode 1597)
+2. **Parallel Courses** (LeetCode 1136)
+3. **Find All Possible Recipes** (LeetCode 2115)
+
+## Important Notes & Tips
+
+### 🚨 Common Pitfalls:
+1. **Cycles in Input**: Always check for cycles before sorting
+2. **Multiple Components**: Handle disconnected components
+3. **Self-loops**: Consider vertices with edges to themselves
+4. **Empty Graph**: Handle edge case of empty graph
+
+### 💡 Optimization Tips:
+1. **Early Termination**: Stop when cycle is detected
+2. **Batch Processing**: Group independent vertices
+3. **Memory Efficiency**: Use bit arrays for large graphs
+4. **Parallel Execution**: Process vertices with same level in parallel
+
+### 🔍 Debugging Tips:
+1. Print in-degrees at each step
+2. Visualize the graph structure
+3. Check for missing edges
+4. Verify cycle detection logic
+
+## Summary
+
+Topological sorting is a fundamental algorithm for ordering vertices in directed acyclic graphs while respecting dependency relationships.
+
+### Key Takeaways:
+- **Two Main Approaches**: DFS-based and Kahn's algorithm (BFS-based)
+- **Cycle Detection**: Essential feature for validating DAGs
+- **Multiple Solutions**: DAGs can have multiple valid topological orders
+- **Practical Applications**: Scheduling, build systems, course planning
+
+### Master Topological Sorting by:
+1. Understanding the dependency concept
+2. Implementing both DFS and BFS approaches
+3. Practicing cycle detection
+4. Solving real-world scheduling problems
+
+**Choose the right approach:**
+- **DFS**: When you need to detect cycles and get one valid ordering
+- **Kahn's**: When you want level-by-level processing or all possible orderings
+- **Lexicographic**: When you need the smallest valid ordering
+
+---
+
+*Remember: Topological sorting is all about respecting dependencies - think of it as organizing tasks where some must be done before others.*               
+
+//11/7/25 (day18)//
+KMP String Matching Algorithm - Complete Study Notes
+Table of Contents
+Introduction
+Problem Statement
+Naive Approach & Its Problems
+KMP Algorithm Overview
+Failure Function (LPS Array)
+Step-by-Step Process
+Implementation
+Time & Space Complexity
+Examples
+Applications
+Advantages & Disadvantages
+Variations
+Practice Problems
+
+Introduction
+KMP (Knuth-Morris-Pratt) Algorithm is an efficient string matching algorithm that finds occurrences of a pattern string within a text string. It was developed by Donald Knuth, James Morris, and Vaughan Pratt in 1977.
+
+Key Characteristics:
+Linear Time Complexity: O(n + m) where n = text length, m = pattern length
+Preprocessing: Uses a failure function to avoid redundant comparisons
+No Backtracking: Never moves backwards in the text
+Optimal: Achieves the theoretical lower bound for string matching
+Deterministic: Always produces the same result for given input
+Why KMP is Important:
+Efficiency: Much faster than naive approach for large texts
+Foundation: Basis for many other string algorithms
+Practical: Used in text editors, search engines, and compilers
+Educational: Teaches important concepts of preprocessing and pattern analysis
+Problem Statement
+String Matching Problem: Given a text string T of length n and a pattern string P of length m, find all occurrences of P in T.
+
+Input:
+Text: T = "ABABDABACDABABCABCABCABCABC"
+Pattern: P = "ABABCABCABCABC"
+Output:
+All starting positions where pattern occurs in text
+Example: Pattern found at position 10
+Constraints:
+Both strings can contain any characters
+Pattern length ≤ Text length
+Case-sensitive matching (unless specified otherwise)
+Naive Approach & Its Problems
+Naive Algorithm:
+def naive_search(text, pattern):
+    n = len(text)
+    m = len(pattern)
+    positions = []
+    
+    for i in range(n - m + 1):
+        j = 0
+        while j < m and text[i + j] == pattern[j]:
+            j += 1
+        if j == m:
+            positions.append(i)
+    
+    return positions
+Problems with Naive Approach:
+1. Redundant Comparisons
+Text:    ABABDABABCAB
+Pattern: ABABCAB
+         ↑
+         Mismatch at position 4
+
+Naive approach restarts from position 1:
+Text:    ABABDABABCAB
+Pattern:  ABABCAB
+          ↑
+          Wastes previous comparison information
+2. Time Complexity
+Worst Case: O(n × m)
+Example: Text = "AAAA...A", Pattern = "AAA...AB"
+Problem: Rechecks many characters multiple times
+3. Inefficient for Repetitive Patterns
+Patterns with repeated substrings cause maximum backtracking
+Real-world texts often have repetitive patterns
+KMP Algorithm Overview
+Core Innovation:
+KMP avoids redundant comparisons by preprocessing the pattern to determine how much we can skip when a mismatch occurs.
+
+Key Insights:
+1. Use Previous Information
+When mismatch occurs, we already know some characters matched
+Use this information to determine next comparison position
+2. Failure Function (LPS)
+LPS: Longest Proper Prefix which is also Suffix
+Tells us how much of the pattern can be "reused" after a mismatch
+3. No Backtracking in Text
+Text pointer never moves backward
+Only pattern pointer adjusts based on failure function
+Algorithm Phases:
+Phase 1: Preprocessing
+Compute failure function (LPS array) for the pattern
+Time: O(m)
+Phase 2: Searching
+Use LPS array to efficiently search for pattern in text
+Time: O(n)
+Total Time: O(n + m)
+
+Failure Function (LPS Array)
+Definition:
+LPS[i] = Length of the longest proper prefix of pattern[0...i] which is also a suffix of pattern[0...i]
+
+Key Properties:
+Proper Prefix: Prefix that is not equal to the string itself
+Suffix: Any suffix of the string
+LPS[0] = 0 (by definition)
+Example:
+Pattern: "ABABCAB"
+Index:    0123456
+
+LPS Array Construction:
+i=0: "A" → LPS[0] = 0 (no proper prefix)
+i=1: "AB" → LPS[1] = 0 (no matching prefix-suffix)
+i=2: "ABA" → LPS[2] = 1 ("A" is both prefix and suffix)
+i=3: "ABAB" → LPS[3] = 2 ("AB" is both prefix and suffix)
+i=4: "ABABC" → LPS[4] = 0 (no matching prefix-suffix)
+i=5: "ABABCA" → LPS[5] = 1 ("A" is both prefix and suffix)
+i=6: "ABABCAB" → LPS[6] = 2 ("AB" is both prefix and suffix)
+
+Final LPS: [0, 0, 1, 2, 0, 1, 2]
+LPS Computation Algorithm:
+def compute_lps(pattern):
+    m = len(pattern)
+    lps = [0] * m
+    length = 0  # Length of previous longest prefix suffix
+    i = 1
+    
+    while i < m:
+        if pattern[i] == pattern[length]:
+            length += 1
+            lps[i] = length
+            i += 1
+        else:
+            if length != 0:
+                # Use previously computed LPS value
+                length = lps[length - 1]
+            else:
+                lps[i] = 0
+                i += 1
+    
+    return lps
+Visual Example of LPS:
+Pattern: "ABABCAB"
+         0123456
+
+For i=6 (character 'B'):
+- Current substring: "ABABCAB"
+- Proper prefixes: "", "A", "AB", "ABA", "ABAB", "ABABC", "ABABCA"
+- Suffixes: "", "B", "AB", "CAB", "BCAB", "ABCAB", "BABCAB", "ABABCAB"
+- Matching: "AB" (length 2)
+- So LPS[6] = 2
+Step-by-Step Process
+Complete KMP Algorithm:
+Step 1: Compute LPS Array
+def compute_lps(pattern):
+    m = len(pattern)
+    lps = [0] * m
+    length = 0
+    i = 1
+    
+    while i < m:
+        if pattern[i] == pattern[length]:
+            length += 1
+            lps[i] = length
+            i += 1
+        else:
+            if length != 0:
+                length = lps[length - 1]
+            else:
+                lps[i] = 0
+                i += 1
+    return lps
+Step 2: Search Using LPS
+def kmp_search(text, pattern):
+    n = len(text)
+    m = len(pattern)
+    
+    if m == 0:
+        return []
+    
+    # Compute LPS array
+    lps = compute_lps(pattern)
+    
+    result = []
+    i = 0  # Index for text
+    j = 0  # Index for pattern
+    
+    while i < n:
+        if text[i] == pattern[j]:
+            i += 1
+            j += 1
+        
+        if j == m:
+            # Found complete match
+            result.append(i - j)
+            j = lps[j - 1]  # Continue searching
+        elif i < n and text[i] != pattern[j]:
+            if j != 0:
+                j = lps[j - 1]  # Use failure function
+            else:
+                i += 1  # Move to next character in text
+    
+    return result
+Detailed Example Trace:
+Text:    "ABABDABACDABABCABCABCABCABC"
+Pattern: "ABABCAB"
+LPS:     [0, 0, 1, 2, 0, 1, 2]
+
+Step-by-step matching:
+i=0, j=0: A==A ✓ → i=1, j=1
+i=1, j=1: B==B ✓ → i=2, j=2
+i=2, j=2: A==A ✓ → i=3, j=3
+i=3, j=3: B==B ✓ → i=4, j=4
+i=4, j=4: D!=C ✗ → j=lps[3]=2, i=4
+i=4, j=2: D!=A ✗ → j=lps[1]=0, i=4
+i=4, j=0: D!=A ✗ → i=5, j=0
+...continue until match found...
+Implementation
+Complete Python Implementation:
+class KMP:
+    def __init__(self, pattern):
+        self.pattern = pattern
+        self.lps = self._compute_lps()
+    
+    def _compute_lps(self):
+        """Compute the Longest Proper Prefix which is also Suffix array"""
+        m = len(self.pattern)
+        lps = [0] * m
+        length = 0
+        i = 1
+        
+        while i < m:
+            if self.pattern[i] == self.pattern[length]:
+                length += 1
+                lps[i] = length
+                i += 1
+            else:
+                if length != 0:
+                    length = lps[length - 1]
+                else:
+                    lps[i] = 0
+                    i += 1
+        
+        return lps
+    
+    def search(self, text):
+        """Find all occurrences of pattern in text"""
+        n = len(text)
+        m = len(self.pattern)
+        
+        if m == 0:
+            return []
+        
+        result = []
+        i = 0  # Index for text
+        j = 0  # Index for pattern
+        
+        while i < n:
+            if text[i] == self.pattern[j]:
+                i += 1
+                j += 1
+            
+            if j == m:
+                result.append(i - j)
+                j = self.lps[j - 1]
+            elif i < n and text[i] != self.pattern[j]:
+                if j != 0:
+                    j = self.lps[j - 1]
+                else:
+                    i += 1
+        
+        return result
+    
+    def search_first(self, text):
+        """Find first occurrence of pattern in text"""
+        matches = self.search(text)
+        return matches[0] if matches else -1
+    
+    def count_occurrences(self, text):
+        """Count total occurrences of pattern in text"""
+        return len(self.search(text))
+    
+    def get_lps(self):
+        """Return the LPS array for debugging"""
+        return self.lps
+
+# Usage Example
+if __name__ == "__main__":
+    # Example 1: Basic usage
+    text = "ABABDABACDABABCABCABCABCABC"
+    pattern = "ABABCAB"
+    
+    kmp = KMP(pattern)
+    print(f"Pattern: {pattern}")
+    print(f"LPS Array: {kmp.get_lps()}")
+    print(f"Text: {text}")
+    
+    matches = kmp.search(text)
+    print(f"Pattern found at positions: {matches}")
+    
+    # Example 2: Multiple patterns
+    patterns = ["AB", "ABC", "CAB"]
+    for p in patterns:
+        kmp = KMP(p)
+        matches = kmp.search(text)
+        print(f"Pattern '{p}' found at: {matches}")
+C++ Implementation:
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class KMP {
+private:
+    string pattern;
+    vector<int> lps;
+    
+    void computeLPS() {
+        int m = pattern.length();
+        lps.resize(m, 0);
+        int len = 0;
+        int i = 1;
+        
+        while (i < m) {
+            if (pattern[i] == pattern[len]) {
+                len++;
+                lps[i] = len;
+                i++;
+            } else {
+                if (len != 0) {
+                    len = lps[len - 1];
+                } else {
+                    lps[i] = 0;
+                    i++;
+                }
+            }
+        }
+    }
+
+public:
+    KMP(const string& pat) : pattern(pat) {
+        computeLPS();
+    }
+    
+    vector<int> search(const string& text) {
+        vector<int> result;
+        int n = text.length();
+        int m = pattern.length();
+        
+        if (m == 0) return result;
+        
+        int i = 0, j = 0;
+        
+        while (i < n) {
+            if (text[i] == pattern[j]) {
+                i++;
+                j++;
+            }
+            
+            if (j == m) {
+                result.push_back(i - j);
+                j = lps[j - 1];
+            } else if (i < n && text[i] != pattern[j]) {
+                if (j != 0) {
+                    j = lps[j - 1];
+                } else {
+                    i++;
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    vector<int> getLPS() const {
+        return lps;
+    }
+};
+
+// Usage
+int main() {
+    string text = "ABABDABACDABABCABCABCABCABC";
+    string pattern = "ABABCAB";
+    
+    KMP kmp(pattern);
+    vector<int> matches = kmp.search(text);
+    
+    cout << "Pattern found at positions: ";
+    for (int pos : matches) {
+        cout << pos << " ";
+    }
+    cout << endl;
+    
+    return 0;
+}
+Advanced Implementation with Additional Features:
+class AdvancedKMP:
+    def __init__(self, pattern, case_sensitive=True):
+        self.original_pattern = pattern
+        self.pattern = pattern if case_sensitive else pattern.lower()
+        self.case_sensitive = case_sensitive
+        self.lps = self._compute_lps()
+    
+    def _compute_lps(self):
+        m = len(self.pattern)
+        lps = [0] * m
+        length = 0
+        i = 1
+        
+        while i < m:
+            if self.pattern[i] == self.pattern[length]:
+                length += 1
+                lps[i] = length
+                i += 1
+            else:
+                if length != 0:
+                    length = lps[length - 1]
+                else:
+                    lps[i] = 0
+                    i += 1
+        return lps
+    
+    def search_with_context(self, text, context_length=10):
+        """Search with surrounding context for each match"""
+        search_text = text if self.case_sensitive else text.lower()
+        matches = []
+        
+        positions = self._basic_search(search_text)
+        
+        for pos in positions:
+            start_context = max(0, pos - context_length)
+            end_context = min(len(text), pos + len(self.pattern) + context_length)
+            
+            context_before = text[start_context:pos]
+            matched_text = text[pos:pos + len(self.pattern)]
+            context_after = text[pos + len(self.pattern):end_context]
+            
+            matches.append({
+                'position': pos,
+                'context_before': context_before,
+                'matched_text': matched_text,
+                'context_after': context_after,
+                'full_context': text[start_context:end_context]
+            })
+        
+        return matches
+    
+    def _basic_search(self, text):
+        n = len(text)
+        m = len(self.pattern)
+        
+        if m == 0:
+            return []
+        
+        result = []
+        i = j = 0
+        
+        while i < n:
+            if text[i] == self.pattern[j]:
+                i += 1
+                j += 1
+            
+            if j == m:
+                result.append(i - j)
+                j = self.lps[j - 1]
+            elif i < n and text[i] != self.pattern[j]:
+                if j != 0:
+                    j = self.lps[j - 1]
+                else:
+                    i += 1
+        
+        return result
+    
+    def search_overlapping(self, text):
+        """Find all occurrences including overlapping ones"""
+        search_text = text if self.case_sensitive else text.lower()
+        n = len(search_text)
+        m = len(self.pattern)
+        
+        if m == 0:
+            return []
+        
+        result = []
+        
+        # Use sliding window approach for overlapping matches
+        for i in range(n - m + 1):
+            if search_text[i:i + m] == self.pattern:
+                result.append(i)
+        
+        return result
+Time & Space Complexity
+Time Complexity:
+Preprocessing (LPS computation):
+Best/Average/Worst Case: O(m)
+Explanation: Each character is processed at most twice
+Searching Phase:
+Best Case: O(n) - when no matches or immediate mismatch
+Average Case: O(n) - typical real-world performance
+Worst Case: O(n) - even with many partial matches
+Overall Time Complexity:
+Total: O(n + m)
+Comparison with Naive: O(n × m) vs O(n + m)
+Space Complexity:
+LPS Array: O(m)
+Variables: O(1)
+Total: O(m)
+Complexity Comparison:
+Algorithm	Time Complexity	Space Complexity	Notes
+Naive	O(n × m)	O(1)	Simple but inefficient
+KMP	O(n + m)	O(m)	Optimal time complexity
+Rabin-Karp	O(n + m) avg, O(nm) worst	O(1)	Uses hashing
+Boyer-Moore	O(n + m) avg, O(nm) worst	O(σ + m)	Good for large alphabets
+Examples
+Example 1: Detailed Trace
+Text: "ABABDABACDABABCABCABCABCABC"
+Pattern: "ABABCAB"
+
+Step 1: Compute LPS
+Pattern: A B A B C A B
+Index:   0 1 2 3 4 5 6
+LPS:     0 0 1 2 0 1 2
+
+Step 2: Search Process
+i j  Text[i] Pattern[j] Action
+0 0  A       A          Match → i=1, j=1
+1 1  B       B          Match → i=2, j=2
+2 2  A       A          Match → i=3, j=3
+3 3  B       B          Match → i=4, j=4
+4 4  D       C          Mismatch → j=lps[3]=2
+4 2  D       A          Mismatch → j=lps[1]=0
+4 0  D       A          Mismatch → i=5
+5 0  A       A          Match → i=6, j=1
+...continue...
+
+Final matches found at positions: [10]
+Example 2: Multiple Occurrences
+def demonstrate_kmp():
+    # Text with multiple pattern occurrences
+    text = "ABCABCABCABC"
+    pattern = "ABCABC"
+    
+    kmp = KMP(pattern)
+    print(f"Text: {text}")
+    print(f"Pattern: {pattern}")
+    print(f"LPS: {kmp.get_lps()}")
+    
+    matches = kmp.search(text)
+    print(f"Matches found at: {matches}")
+    
+    # Visualize matches
+    for i, pos in enumerate(matches):
+        print(f"Match {i+1}: Position {pos}")
+        print(f"  {text}")
+        print(f"  {' ' * pos}{pattern}")
+
+# Output:
+# Text: ABCABCABCABC
+# Pattern: ABCABC
+# LPS: [0, 0, 0, 1, 2, 3]
+# Matches found at: [0, 3, 6]
+Example 3: Real-World Text Processing
+def find_words_in_document():
+    document = """
+    The quick brown fox jumps over the lazy dog.
+    The dog was really lazy, but the fox was quick.
+    """
+    
+    words_to_find = ["the", "quick", "lazy"]
+    
+    for word in words_to_find:
+        kmp = KMP(word)
+        matches = kmp.search(document.lower())
+        print(f"'{word}' found {len(matches)} times at positions: {matches}")
+
+# Example output:
+# 'the' found 4 times at positions: [5, 41, 55, 75]
+# 'quick' found 2 times at positions: [9, 81]
+# 'lazy' found 2 times at positions: [46, 65]
+Applications
+1. Text Editors
+class TextEditor:
+    def __init__(self):
+        self.content = ""
+    
+    def find_and_replace(self, find_text, replace_text):
+        kmp = KMP(find_text)
+        positions = kmp.search(self.content)
+        
+        # Replace from end to beginning to maintain positions
+        for pos in reversed(positions):
+            self.content = (self.content[:pos] + 
+                          replace_text + 
+                          self.content[pos + len(find_text):])
+        
+        return len(positions)
+2. DNA Sequence Analysis
+def find_dna_patterns(dna_sequence, pattern):
+    """Find genetic patterns in DNA sequences"""
+    kmp = KMP(pattern)
+    matches = kmp.search(dna_sequence)
+    
+    return {
+        'pattern': pattern,
+        'occurrences': len(matches),
+        'positions': matches,
+        'percentage': (len(matches) * len(pattern) / len(dna_sequence)) * 100
+    }
+
+# Example
+dna = "ATCGATCGATCGTAGCTAGCTAGC"
+pattern = "ATCG"
+result = find_dna_patterns(dna, pattern)
+3. Network Security (Intrusion Detection)
+class IntrusionDetector:
+    def __init__(self):
+        self.malicious_patterns = [
+            "SELECT * FROM",
+            "<script>",
+            "../../",
+            "eval("
+        ]
+        self.kmp_objects = [KMP(pattern.lower()) for pattern in self.malicious_patterns]
+    
+    def scan_payload(self, payload):
+        threats = []
+        payload_lower = payload.lower()
+        
+        for i, kmp in enumerate(self.kmp_objects):
+            matches = kmp.search(payload_lower)
+            if matches:
+                threats.append({
+                    'pattern': self.malicious_patterns[i],
+                    'positions': matches,
+                    'threat_level': 'HIGH'
+                })
+        
+        return threats
+4. Compiler Design (Lexical Analysis)
+class Lexer:
+    def __init__(self):
+        self.keywords = {
+            'if': 'IF',
+            'else': 'ELSE',
+            'while': 'WHILE',
+            'for': 'FOR',
+            'return': 'RETURN'
+        }
+        self.kmp_keywords = {kw: KMP(kw) for kw in self.keywords}
+    
+    def tokenize(self, source_code):
+        tokens = []
+        words = source_code.split()
+        
+        for word in words:
+            for keyword, kmp in self.kmp_keywords.items():
+                if kmp.search_first(word) == 0 and len(word) == len(keyword):
+                    tokens.append(('KEYWORD', self.keywords[keyword]))
+                    break
+            else:
+                tokens.append(('IDENTIFIER', word))
+        
+        return tokens
+5. Data Compression
+def find_repeated_substrings(text, min_length=3):
+    """Find repeated substrings for compression algorithms"""
+    repeated = {}
+    
+    for i in range(len(text) - min_length + 1):
+        for length in range(min_length, len(text) - i + 1):
+            pattern = text[i:i + length]
+            
+            if pattern not in repeated:
+                kmp = KMP(pattern)
+                matches = kmp.search(text)
+                
+                if len(matches) > 1:  # Found repetition
+                    repeated[pattern] = {
+                        'count': len(matches),
+                        'positions': matches,
+                        'savings': (len(matches) - 1) * length
+                    }
+    
+    return repeated
+Advantages & Disadvantages
+✅ Advantages:
+1. Optimal Time Complexity
+O(n + m) is theoretically optimal for string matching
+Significant improvement over naive O(n × m)
+2. No Backtracking
+Text pointer never moves backward
+Suitable for streaming data processing
+3. Predictable Performance
+Consistent O(n + m) in all cases
+No worst-case performance degradation
+4. Memory Efficient
+Only requires O(m) extra space for LPS array
+Can be optimized further for space
+5. Foundation for Other Algorithms
+Basis for many advanced string algorithms
+Educational value for understanding pattern matching
+❌ Disadvantages:
+1. Preprocessing Overhead
+Must compute LPS array before searching
+Not suitable for single-character searches
+2. Space Requirement
+Requires O(m) extra space
+May be significant for very long patterns
+3. Not Always Fastest in Practice
+For small patterns, naive approach might be faster
+Modern processors favor simple loops
+4. Limited to Exact Matching
+Doesn't handle approximate matching
+No built-in support for wildcards or regex
+5. Complex Implementation
+More complex than naive approach
+Requires understanding of failure function
+Variations
+1. Multiple Pattern Matching (Aho-Corasick)
+class AhoCorasick:
+    """Extension of KMP for multiple patterns"""
+    def __init__(self, patterns):
+        self.patterns = patterns
+        self.build_automaton()
+    
+    def build_automaton(self):
+        # Build trie and failure links
+        # Implementation details...
+        pass
+    
+    def search_multiple(self, text):
+        # Find all patterns simultaneously
+        pass
+2. Approximate String Matching
+def kmp_with_mismatches(text, pattern, max_mismatches):
+    """KMP variant allowing limited mismatches"""
+    # Implementation using dynamic programming
+    # Allow up to k mismatches while maintaining efficiency
+    pass
+3. Circular String Matching
+def kmp_circular(text, pattern):
+    """Find pattern in circular string (text wraps around)"""
+    extended_text = text + text[:len(pattern)-1]
+    kmp = KMP(pattern)
+    matches = kmp.search(extended_text)
+    
+    # Filter matches that would wrap around
+    circular_matches = [m for m in matches if m < len(text)]
+    return circular_matches
+4. Streaming KMP
+class StreamingKMP:
+    """KMP for streaming data processing"""
+    def __init__(self, pattern):
+        self.pattern = pattern
+        self.lps = self._compute_lps()
+        self.j = 0  # Current position in pattern
+        self.position = 0  # Current position in text
+    
+    def process_char(self, char):
+        """Process one character from stream"""
+        while self.j > 0 and char != self.pattern[self.j]:
+            self.j = self.lps[self.j - 1]
+        
+        if char == self.pattern[self.j]:
+            self.j += 1
+        
+        self.position += 1
+        
+        if self.j == len(self.pattern):
+            match_position = self.position - self.j
+            self.j = self.lps[self.j - 1]
+            return match_position
+        
+        return None
+Important Notes & Tips
+🚨 Common Pitfalls:
+1. LPS Computation Errors
+# WRONG: Infinite loop
+while i < m:
+    if pattern[i] == pattern[length]:
+        length += 1
+        lps[i] = length
+        i += 1
+    else:
+        length = lps[length - 1]  # Missing else clause
+2. Off-by-One Errors
+# WRONG: Incorrect boundary
+if j == m - 1:  # Should be j == m
+    result.append(i - j)
+3. Case Sensitivity Issues
+# Handle case sensitivity explicitly
+text = text.lower() if not case_sensitive else text
+pattern = pattern.lower() if not case_sensitive else pattern
+💡 Optimization Tips:
+1. Early Termination
+def kmp_search_first(text, pattern):
+    """Stop after finding first match"""
+    # Modify search to return immediately after first match
+    pass
+2. Memory Optimization
+def kmp_space_optimized(text, pattern):
+    """Reduce space complexity for very long patterns"""
+    # Use rolling hash or other techniques
+    pass
+3. Cache LPS Arrays
+class KMPCache:
+    def __init__(self):
+        self.lps_cache = {}
+    
+    def get_kmp(self, pattern):
+        if pattern not in self.lps_cache:
+            self.lps_cache[pattern] = KMP(pattern)
+        return self.lps_cache[pattern]
+🔍 Debugging Tips:
+1. Visualize LPS Construction
+def debug_lps(pattern):
+    """Print step-by-step LPS construction"""
+    print(f"Computing LPS for pattern: {pattern}")
+    # Add debug prints in LPS computation
+2. Trace Search Process
+def debug_search(text, pattern):
+    """Print detailed search trace"""
+    print(f"Searching '{pattern}' in '{text}'")
+    # Add debug prints in search function
+Practice Problems
+Beginner Level:
+Implement Basic KMP - Code from scratch
+Find First Occurrence (LeetCode 28)
+Count Pattern Occurrences - Count all matches
+Intermediate Level:
+Repeated String Match (LeetCode 686)
+Shortest Palindrome (LeetCode 214) - Uses KMP concepts
+Periodic String - Find if string is periodic
+Advanced Level:
+Multiple Pattern Search - Implement Aho-Corasick
+Approximate String Matching - Allow k mismatches
+Streaming Pattern Detection - Process data streams
+Real-World Projects:
+Text Editor Search - Implement find/replace
+Log File Analyzer - Find patterns in logs
+DNA Sequence Matcher - Bioinformatics application
+Summary
+KMP Algorithm is a cornerstone of string processing, providing optimal time complexity for exact string matching through clever preprocessing and the avoidance of redundant comparisons.
+
+Key Takeaways:
+Core Concepts:
+Failure Function (LPS): The heart of KMP's efficiency
+No Backtracking: Text pointer only moves forward
+Preprocessing: Invest O(m) time to save O(n×m) time
+When to Use KMP:
+Large texts with repeated pattern searches
+Streaming data processing
+When consistent performance is crucial
+Educational purposes for learning string algorithms
+Master KMP by:
+Understanding LPS array construction deeply
+Tracing through examples step-by-step
+Implementing from scratch multiple times
+Applying to real-world problems
+Performance Guidelines:
+Use KMP when: Pattern length > 3-4 characters
+Consider alternatives when: Single character patterns, very short texts
+Optimize for: Repeated searches with same pattern
+Remember: KMP trades a small amount of space (O(m)) and preprocessing time for dramatically improved search performance. The key insight is learning from partial matches to avoid redundant work.
+
+# Longest Prefix Suffix (LPS) Algorithm
+
+## Overview
+This program implements the Longest Prefix Suffix (LPS) algorithm, which finds the length of the longest proper prefix of a string that is also a suffix of the same string.
+
+## Algorithm Explanation
+
+### What is LPS?
+- **Prefix**: A substring that starts from the beginning of the string
+- **Suffix**: A substring that ends at the end of the string
+- **Proper Prefix/Suffix**: A prefix/suffix that is not equal to the entire string
+- **LPS**: The length of the longest prefix that is also a suffix
+
+### Example
+For string `"abcab"`:
+- Prefixes: `"a"`, `"ab"`, `"abc"`, `"abca"`
+- Suffixes: `"b"`, `"ab"`, `"cab"`, `"bcab"`
+- Common: `"ab"` (length 2)
+- LPS = 2
+
+## Let's Start with a Simpler Example
+
+Before diving into "ababaca", let's understand with a simpler string: **"abab"**
+
+```
+String: a b a b
+Index:  0 1 2 3
+```
+
+**What we're looking for**: Does any prefix match any suffix?
+
+**All possible prefixes of "abab":**
+- "a" (position 0)
+- "ab" (positions 0-1)  
+- "aba" (positions 0-2)
+
+**All possible suffixes of "abab":**
+- "b" (position 3)
+- "ab" (positions 2-3)
+- "bab" (positions 1-3)
+
+**Common ones:** "ab" appears as both prefix and suffix!
+- Prefix "ab" = positions 0-1
+- Suffix "ab" = positions 2-3
+
+So the LPS length for "abab" is 2.
+
+**Now let's trace "abab":**
+
+1. i=1: Compare 'b' with 'a' → No match → lps[1]=0
+2. i=2: Compare 'a' with 'a' → Match! → len=1, lps[2]=1
+3. i=3: Compare 'b' with 'b' → Match! → len=2, lps[3]=2
+
+Result: lps = [0, 0, 1, 2]
+
+**Visual representation:**
+```
+a b a b
+↑   ↑ ↑  
+|   └─┘  These match!
+└─────── This is the prefix "ab"
+```
+
+## Algorithm Steps
+
+### 1. Initialize Variables
+```java
+int n = s.length();
+int[] lps = new int[n];  // LPS array to store values
+int len = 0;             // Length of previous longest prefix suffix
+int i = 1;               // Start from second character
+```
+
+### 2. Build LPS Array
+The algorithm uses two pointers:
+- `len`: Points to the end of the current matching prefix
+- `i`: Current position being processed
+
+### 3. Two Cases
+1. **Characters Match** (`s.charAt(i) == s.charAt(len)`):
+   - Increment `len`
+   - Set `lps[i] = len`
+   - Move to next character (`i++`)
+
+2. **Characters Don't Match**:
+   - If `len != 0`: Use previously computed LPS value (`len = lps[len - 1]`)
+   - If `len == 0`: Set `lps[i] = 0` and move to next character
+
+## Code Walkthrough
+
+```java
+while (i < n) {
+    if (s.charAt(i) == s.charAt(len)) {
+        // Case 1: Characters match
+        len++;
+        lps[i] = len;
+        i++;
+    } else {
+        // Case 2: Characters don't match
+        if (len != 0) {
+            // Try shorter prefix
+            len = lps[len - 1];
+        } else {
+            // No match possible
+            lps[i] = 0;
+            i++;
+        }
+    }
+}
+```
+
+## Example Trace - Step by Step Understanding
+
+For string `"ababaca"` (indices 0,1,2,3,4,5,6):
+
+```
+String:  a b a b a c a
+Index:   0 1 2 3 4 5 6
+```
+
+**Initial Setup:**
+- `lps = [0, 0, 0, 0, 0, 0, 0]` (all zeros initially)
+- `len = 0` (length of current matching prefix)
+- `i = 1` (we start from index 1, not 0)
+
+**Step-by-Step Execution:**
+
+### Step 1: i=1, char='b'
+- **Compare**: s[1]='b' vs s[0]='a' (len=0)
+- **Match?** No
+- **Action**: Since len=0, set lps[1]=0, move i to 2
+- **Result**: lps = [0, 0, 0, 0, 0, 0, 0]
+
+### Step 2: i=2, char='a'
+- **Compare**: s[2]='a' vs s[0]='a' (len=0)
+- **Match?** Yes! 
+- **Action**: len becomes 1, lps[2]=1, move i to 3
+- **Meaning**: "a" at position 0 matches "a" at position 2
+- **Result**: lps = [0, 0, 1, 0, 0, 0, 0]
+
+### Step 3: i=3, char='b'
+- **Compare**: s[3]='b' vs s[1]='b' (len=1)
+- **Match?** Yes!
+- **Action**: len becomes 2, lps[3]=2, move i to 4
+- **Meaning**: "ab" (positions 0-1) matches "ab" (positions 2-3)
+- **Result**: lps = [0, 0, 1, 2, 0, 0, 0]
+
+### Step 4: i=4, char='a'
+- **Compare**: s[4]='a' vs s[2]='a' (len=2)
+- **Match?** Yes!
+- **Action**: len becomes 3, lps[4]=3, move i to 5
+- **Meaning**: "aba" (positions 0-2) matches "aba" (positions 2-4)
+- **Result**: lps = [0, 0, 1, 2, 3, 0, 0]
+
+### Step 5: i=5, char='c' (This is the tricky part!)
+- **Compare**: s[5]='c' vs s[3]='b' (len=3)
+- **Match?** No
+- **Action**: Since len≠0, try a shorter prefix: len = lps[len-1] = lps[2] = 1
+- **Now Compare**: s[5]='c' vs s[1]='b' (len=1)
+- **Match?** Still No
+- **Action**: len = lps[len-1] = lps[0] = 0
+- **Now Compare**: s[5]='c' vs s[0]='a' (len=0)
+- **Match?** Still No
+- **Action**: Since len=0, set lps[5]=0, move i to 6
+- **Result**: lps = [0, 0, 1, 2, 3, 0, 0]
+
+### Step 6: i=6, char='a'
+- **Compare**: s[6]='a' vs s[0]='a' (len=0)
+- **Match?** Yes!
+- **Action**: len becomes 1, lps[6]=1, i becomes 7 (end)
+- **Meaning**: "a" at position 0 matches "a" at position 6
+- **Result**: lps = [0, 0, 1, 2, 3, 0, 1]
+
+**Final Answer**: The longest prefix that is also a suffix has length 1 (the character "a")
+
+## Table Format for Quick Reference
+
+| Step | i | char | len | s[len] | Match? | Action | lps[i] | lps array |
+|------|---|------|-----|--------|--------|--------|--------|-----------|
+| 1    | 1 | 'b'  | 0   | 'a'    | No     | lps[1]=0, i++ | 0 | [0,0,0,0,0,0,0] |
+| 2    | 2 | 'a'  | 0   | 'a'    | Yes    | len++, lps[2]=1, i++ | 1 | [0,0,1,0,0,0,0] |
+| 3    | 3 | 'b'  | 1   | 'b'    | Yes    | len++, lps[3]=2, i++ | 2 | [0,0,1,2,0,0,0] |
+| 4    | 4 | 'a'  | 2   | 'a'    | Yes    | len++, lps[4]=3, i++ | 3 | [0,0,1,2,3,0,0] |
+| 5a   | 5 | 'c'  | 3   | 'b'    | No     | len=lps[2]=1 | - | [0,0,1,2,3,0,0] |
+| 5b   | 5 | 'c'  | 1   | 'b'    | No     | len=lps[0]=0 | - | [0,0,1,2,3,0,0] |
+| 5c   | 5 | 'c'  | 0   | 'a'    | No     | lps[5]=0, i++ | 0 | [0,0,1,2,3,0,0] |
+| 6    | 6 | 'a'  | 0   | 'a'    | Yes    | len++, lps[6]=1, i++ | 1 | [0,0,1,2,3,0,1] |
+
+**Final Result**: lps = [0, 0, 1, 2, 3, 0, 1], Answer = 1
+
+**Note**: Step 5 has three sub-steps (5a, 5b, 5c) because we keep trying shorter prefixes until we find a match or len becomes 0.
+
+## Why This Matters - Visual Understanding
+
+```
+String: a b a b a c a
+Index:  0 1 2 3 4 5 6
+LPS:    0 0 1 2 3 0 1
+```
+
+**What each LPS value means:**
+- lps[0] = 0: Always 0 (no proper prefix for single character)
+- lps[1] = 0: "ab" has no proper prefix that's also a suffix
+- lps[2] = 1: "aba" has prefix "a" that's also a suffix
+- lps[3] = 2: "abab" has prefix "ab" that's also a suffix
+- lps[4] = 3: "ababa" has prefix "aba" that's also a suffix
+- lps[5] = 0: "ababac" has no proper prefix that's also a suffix
+- lps[6] = 1: "ababaca" has prefix "a" that's also a suffix
+
+## Key Insight: Why We Use lps[len-1] When There's a Mismatch
+
+When we have a mismatch, instead of starting over, we use the LPS value to "jump back" to a position where we might still have a match. This is the genius of the algorithm - it avoids redundant comparisons!
+
+## Applications
+
+1. **String Matching**: Used in KMP (Knuth-Morris-Pratt) algorithm
+2. **Pattern Recognition**: Finding repeating patterns in strings
+3. **Text Processing**: Efficient substring searching
+4. **Data Compression**: Identifying redundant patterns
+
+## Time & Space Complexity
+
+- **Time Complexity**: O(n) where n is the length of the string
+- **Space Complexity**: O(n) for the LPS array
+
+## Key Insights
+
+1. The algorithm avoids redundant comparisons by using previously computed LPS values
+2. When a mismatch occurs, we don't start from the beginning but use the LPS value to skip characters
+3. The LPS array itself follows the LPS property - each position stores the length of the longest proper prefix-suffix for the substring ending at that position
+
+## Input/Output
+
+- **Input**: A string from user input
+- **Output**: Length of the longest prefix that is also a suffix
+
+Example:
+- Input: `"ababaca"`
+- Output: `1` (prefix "a" is also a suffix)
+
+
+# Rabin-Karp String Matching Algorithm
+## Overview
+The Rabin-Karp algorithm is a string searching algorithm that uses hashing to find any one of a set of pattern strings in a text. It was developed by Richard M. Karp and Michael O. Rabin in 1987.
+
+## Key Concepts
+
+### 1. Rolling Hash
+- Uses a rolling hash function to compute hash values efficiently
+- Allows checking multiple substrings without recalculating the entire hash
+- Hash value can be updated in O(1) time when sliding the window
+
+### 2. Hash Function
+The algorithm typically uses a polynomial rolling hash:
+```
+hash(s) = (s[0] * p^(n-1) + s[1] * p^(n-2) + ... + s[n-1] * p^0) mod m
+```
+Where:
+- `s` is the string
+- `p` is a prime number (base)
+- `m` is a large prime number (modulus)
+- `n` is the length of the string
+
+## Algorithm Steps
+
+### 1. Preprocessing
+1. Calculate hash value of the pattern
+2. Calculate hash value of the first window of text (same length as pattern)
+3. Precompute the highest power of the base: `h = p^(m-1) mod q`
+
+### 2. Searching
+1. Compare hash values of pattern and current window
+2. If hash values match:
+   - Perform character-by-character comparison (to handle hash collisions)
+   - If characters match, pattern found
+3. Slide the window by one position
+4. Update hash using rolling hash technique
+5. Repeat until end of text
+
+## Implementation
+
+### Python Implementation
+```python
+def rabin_karp(text, pattern, prime=101):
+    """
+    Rabin-Karp string matching algorithm
+    
+    Args:
+        text: The text to search in
+        pattern: The pattern to search for
+        prime: Prime number for hashing (default 101)
+    
+    Returns:
+        List of starting indices where pattern is found
+    """
+    n = len(text)
+    m = len(pattern)
+    matches = []
+    
+    if m > n:
+        return matches
+    
+    # Calculate hash values
+    pattern_hash = 0
+    text_hash = 0
+    h = 1
+    
+    # Calculate h = pow(256, m-1) % prime
+    for i in range(m - 1):
+        h = (h * 256) % prime
+    
+    # Calculate initial hash values
+    for i in range(m):
+        pattern_hash = (256 * pattern_hash + ord(pattern[i])) % prime
+        text_hash = (256 * text_hash + ord(text[i])) % prime
+    
+    # Slide pattern over text
+    for i in range(n - m + 1):
+        # Check if hash values match
+        if pattern_hash == text_hash:
+            # Check character by character
+            if text[i:i+m] == pattern:
+                matches.append(i)
+        
+        # Calculate hash for next window
+        if i < n - m:
+            text_hash = (256 * (text_hash - ord(text[i]) * h) + ord(text[i + m])) % prime
+            # Handle negative hash values
+            if text_hash < 0:
+                text_hash += prime
+    
+    return matches
+
+# Example usage
+text = "ABABDABACDABABCABCABCABCABC"
+pattern = "ABABCAB"
+result = rabin_karp(text, pattern)
+print(f"Pattern found at indices: {result}")
+```
+
+### C++ Implementation
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+vector<int> rabinKarp(string text, string pattern, int prime = 101) {
+    int n = text.length();
+    int m = pattern.length();
+    vector<int> matches;
+    
+    if (m > n) return matches;
+    
+    int patternHash = 0;
+    int textHash = 0;
+    int h = 1;
+    
+    // Calculate h = pow(256, m-1) % prime
+    for (int i = 0; i < m - 1; i++) {
+        h = (h * 256) % prime;
+    }
+    
+    // Calculate initial hash values
+    for (int i = 0; i < m; i++) {
+        patternHash = (256 * patternHash + pattern[i]) % prime;
+        textHash = (256 * textHash + text[i]) % prime;
+    }
+    
+    // Slide pattern over text
+    for (int i = 0; i <= n - m; i++) {
+        // Check if hash values match
+        if (patternHash == textHash) {
+            // Check character by character
+            bool match = true;
+            for (int j = 0; j < m; j++) {
+                if (text[i + j] != pattern[j]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                matches.push_back(i);
+            }
+        }
+        
+        // Calculate hash for next window
+        if (i < n - m) {
+            textHash = (256 * (textHash - text[i] * h) + text[i + m]) % prime;
+            if (textHash < 0) {
+                textHash += prime;
+            }
+        }
+    }
+    
+    return matches;
+}
+```
+
+## Rolling Hash Calculation
+
+### Adding New Character
+When sliding the window to the right:
+```
+new_hash = (old_hash * base + new_char) % mod
+```
+
+### Removing Old Character and Adding New
+When sliding window (removing leftmost, adding rightmost):
+```
+new_hash = (base * (old_hash - old_char * pow(base, m-1)) + new_char) % mod
+```
+
+### Example
+Text: "ABCDEF", Pattern: "CDE"
+- Window 1: "ABC" → hash₁
+- Window 2: "BCD" → hash₂ = (hash₁ - A×base²) × base + D
+- Window 3: "CDE" → hash₃ = (hash₂ - B×base²) × base + E
+
+## Time Complexity
+
+### Best Case: O(n + m)
+- When there are few or no hash collisions
+- Hash comparisons are O(1)
+- Character verification is minimal
+
+### Average Case: O(n + m)
+- Expected time with good hash function
+- Few false positives due to hash collisions
+
+### Worst Case: O(nm)
+- When hash function produces many collisions
+- Every window has same hash as pattern
+- Requires character-by-character comparison for each window
+
+## Space Complexity: O(1)
+- Only stores hash values and few variables
+- No additional data structures needed
+
+## Advantages
+
+1. **Efficient for Multiple Patterns**: Can search for multiple patterns simultaneously
+2. **Good Average Performance**: O(n + m) expected time
+3. **Simple Implementation**: Straightforward to code and understand
+4. **Rolling Hash**: Efficient hash updates in O(1) time
+
+## Disadvantages
+
+1. **Hash Collisions**: May produce false positives requiring verification
+2. **Worst Case Performance**: Can degrade to O(nm) in pathological cases
+3. **Modular Arithmetic**: Requires careful handling of overflow and negative values
+4. **Hash Function Dependency**: Performance depends on quality of hash function
+
+## Applications
+
+1. **Text Processing**: Document search, word processors
+2. **Bioinformatics**: DNA sequence matching
+3. **Plagiarism Detection**: Finding copied text segments
+4. **Data Deduplication**: Identifying duplicate content
+5. **Network Security**: Pattern matching in intrusion detection systems
+
+## Optimization Techniques
+
+### 1. Multiple Hash Functions
+- Use multiple hash functions to reduce false positives
+- Higher probability of detecting mismatches
+
+### 2. Better Hash Functions
+- Use stronger hash functions like SHA-1 (though slower)
+- Polynomial hashing with larger primes
+
+### 3. Early Termination
+- Stop character comparison on first mismatch
+- Use bloom filters for preliminary filtering
+
+## Comparison with Other Algorithms
+
+| Algorithm | Best Case | Average Case | Worst Case | Space |
+|-----------|-----------|--------------|------------|-------|
+| Rabin-Karp | O(n+m) | O(n+m) | O(nm) | O(1) |
+| KMP | O(n+m) | O(n+m) | O(n+m) | O(m) |
+| Naive | O(n+m) | O(nm) | O(nm) | O(1) |
+| Boyer-Moore | O(n/m) | O(n) | O(nm) | O(σ) |
+
+## Practice Problems
+
+1. Find all occurrences of a pattern in text
+2. Search for multiple patterns simultaneously
+3. Case-insensitive string matching
+4. Find longest repeated substring
+5. Detect plagiarism in documents
+
+## Interview Questions
+
+1. Explain how rolling hash works in Rabin-Karp
+2. What happens when hash collision occurs?
+3. How to handle negative hash values?
+4. Compare Rabin-Karp with KMP algorithm
+5. Optimize Rabin-Karp for multiple pattern search
+
+## Key Points to Remember
+
+- Hash collisions require character-by-character verification
+- Rolling hash enables O(1) window updates
+- Choose prime numbers carefully for hash function
+- Handle modular arithmetic overflow properly
+- Good for multiple pattern search scenarios
+
+# Z Algorithm for String Matching
+
+## Overview
+The Z Algorithm is a linear time string matching algorithm that finds all occurrences of a pattern in a text in O(n + m) time. It was developed by Gusfield and is based on the Z array concept, which stores the length of the longest substring starting from each position that matches a prefix of the string.
+
+## Key Concepts
+
+### 1. Z Array
+The Z array Z[i] for a string S stores the length of the longest substring starting from S[i] which is also a prefix of S.
+
+**Example:**
+- String: "ababaca"
+- Z array: [0, 0, 3, 0, 1, 0, 1]
+
+### 2. Z Box
+A Z-box is a substring S[l...r] which is also a prefix of S. We maintain:
+- `l`: leftmost position of current Z-box
+- `r`: rightmost position of current Z-box
+
+### 3. Pattern Matching Strategy
+To find pattern P in text T:
+1. Create concatenated string: S = P + "$" + T (where "$" is a separator)
+2. Compute Z array for S
+3. Positions where Z[i] = |P| indicate pattern matches in T
+
+## Algorithm Steps
+
+### 1. Z Array Construction
+```
+1. Initialize Z[0] = 0, l = 0, r = 0
+2. For i = 1 to n-1:
+   a. If i > r:
+      - Compare characters starting from position i with prefix
+      - Update Z[i], l, and r accordingly
+   b. Else (i <= r):
+      - k = i - l
+      - If Z[k] < r - i + 1:
+        - Z[i] = Z[k]
+      - Else:
+        - Start comparison from position r+1
+        - Update Z[i], l, and r
+```
+
+### 2. Pattern Matching
+```
+1. Create string S = Pattern + "$" + Text
+2. Compute Z array for S
+3. Scan Z array from position |Pattern| + 1
+4. If Z[i] = |Pattern|, then pattern occurs at position i - |Pattern| - 1 in text
+```
+
+## Implementation
+
+### Python Implementation
+```python
+def z_algorithm(s):
+    """
+    Compute Z array for string s
+    Z[i] = length of longest substring starting from s[i] which is also prefix of s
+    """
+    n = len(s)
+    z = [0] * n
+    l, r = 0, 0
+    
+    for i in range(1, n):
+        if i > r:
+            # Case 1: i is outside current Z-box
+            l, r = i, i
+            while r < n and s[r - l] == s[r]:
+                r += 1
+            z[i] = r - l
+            r -= 1
+        else:
+            # Case 2: i is inside current Z-box
+            k = i - l
+            if z[k] < r - i + 1:
+                # Case 2a: Z[k] is completely inside Z-box
+                z[i] = z[k]
+            else:
+                # Case 2b: Z[k] extends beyond Z-box
+                l = i
+                while r < n and s[r - l] == s[r]:
+                    r += 1
+                z[i] = r - l
+                r -= 1
+    
+    return z
+
+def z_pattern_search(text, pattern):
+    """
+    Find all occurrences of pattern in text using Z algorithm
+    """
+    if not pattern or not text:
+        return []
+    
+    # Create concatenated string
+    concat = pattern + "$" + text
+    z = z_algorithm(concat)
+    
+    matches = []
+    pattern_len = len(pattern)
+    
+    # Check for matches
+    for i in range(pattern_len + 1, len(concat)):
+        if z[i] == pattern_len:
+            # Pattern found at position i - pattern_len - 1 in original text
+            matches.append(i - pattern_len - 1)
+    
+    return matches
+
+# Example usage
+text = "ABABDABACDABABCABCABCABCABC"
+pattern = "ABABCAB"
+matches = z_pattern_search(text, pattern)
+print(f"Pattern found at indices: {matches}")
+
+# Example of Z array computation
+s = "ababaca"
+z_arr = z_algorithm(s)
+print(f"String: {s}")
+print(f"Z array: {z_arr}")
+```
+
+### C++ Implementation
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+vector<int> zAlgorithm(string s) {
+    int n = s.length();
+    vector<int> z(n, 0);
+    int l = 0, r = 0;
+    
+    for (int i = 1; i < n; i++) {
+        if (i > r) {
+            // Case 1: i is outside current Z-box
+            l = r = i;
+            while (r < n && s[r - l] == s[r]) {
+                r++;
+            }
+            z[i] = r - l;
+            r--;
+        } else {
+            // Case 2: i is inside current Z-box
+            int k = i - l;
+            if (z[k] < r - i + 1) {
+                // Case 2a: Z[k] is completely inside Z-box
+                z[i] = z[k];
+            } else {
+                // Case 2b: Z[k] extends beyond Z-box
+                l = i;
+                while (r < n && s[r - l] == s[r]) {
+                    r++;
+                }
+                z[i] = r - l;
+                r--;
+            }
+        }
+    }
+    
+    return z;
+}
+
+vector<int> zPatternSearch(string text, string pattern) {
+    vector<int> matches;
+    if (pattern.empty() || text.empty()) {
+        return matches;
+    }
+    
+    // Create concatenated string
+    string concat = pattern + "$" + text;
+    vector<int> z = zAlgorithm(concat);
+    
+    int patternLen = pattern.length();
+    
+    // Check for matches
+    for (int i = patternLen + 1; i < concat.length(); i++) {
+        if (z[i] == patternLen) {
+            matches.push_back(i - patternLen - 1);
+        }
+    }
+    
+    return matches;
+}
+
+int main() {
+    string text = "ABABDABACDABABCABCABCABCABC";
+    string pattern = "ABABCAB";
+    
+    vector<int> matches = zPatternSearch(text, pattern);
+    
+    cout << "Pattern found at indices: ";
+    for (int pos : matches) {
+        cout << pos << " ";
+    }
+    cout << endl;
+    
+    return 0;
+}
+```
+
+## Step-by-Step Example
+
+### Computing Z Array for "ababaca"
+```
+String: a b a b a c a
+Index:  0 1 2 3 4 5 6
+Z array:[0 0 3 0 1 0 1]
+```
+
+**Step-by-step calculation:**
+1. **i=0**: Z[0] = 0 (by definition)
+2. **i=1**: Compare s[1] with s[0]: 'b' ≠ 'a', so Z[1] = 0
+3. **i=2**: Compare s[2] with s[0]: 'a' = 'a', continue comparing...
+   - s[3] = 'b' = s[1] = 'b' ✓
+   - s[4] = 'a' = s[2] = 'a' ✓
+   - s[5] = 'c' ≠ s[3] = 'b' ✗
+   - So Z[2] = 3, l = 2, r = 4
+4. **i=3**: i ≤ r, k = 3-2 = 1, Z[k] = Z[1] = 0, Z[3] = 0
+5. **i=4**: i = r, k = 4-2 = 2, Z[k] = Z[2] = 3 > r-i+1 = 1
+   - Extend comparison from r+1: s[5] = 'c' ≠ s[1] = 'b'
+   - So Z[4] = 1, l = 4, r = 4
+6. **i=5**: i > r, compare s[5] with s[0]: 'c' ≠ 'a', so Z[5] = 0
+7. **i=6**: i > r, compare s[6] with s[0]: 'a' = 'a', but s[7] doesn't exist
+   - So Z[6] = 1
+
+### Pattern Matching Example
+**Text**: "abababa", **Pattern**: "aba"
+
+1. **Concatenated string**: "aba$abababa"
+2. **Z array**: [0, 0, 1, 0, 1, 0, 3, 0, 1]
+3. **Analysis**:
+   - Position 6: Z[6] = 3 = |pattern|, so match at position 6-3-1 = 2
+   - Positions 4,8: Z[4] = Z[8] = 1 ≠ 3, so no match
+
+## Time Complexity Analysis
+
+### Time Complexity: O(n)
+- Each character is compared at most twice
+- The algorithm maintains that r never decreases except when starting a new Z-box
+- Total comparisons ≤ 2n
+
+### Space Complexity: O(n)
+- Z array requires O(n) space
+- For pattern matching: O(n + m) for concatenated string
+
+## Advantages
+
+1. **Linear Time**: Guaranteed O(n + m) time complexity
+2. **Simple Logic**: Easier to understand than KMP
+3. **No Preprocessing**: Pattern preprocessing is integrated into the algorithm
+4. **Versatile**: Can solve many string problems beyond pattern matching
+5. **Optimal**: Achieves theoretical lower bound for string matching
+
+## Disadvantages
+
+1. **Space Usage**: Requires O(n + m) extra space for concatenated string
+2. **String Concatenation**: Need to create a new string
+3. **Separator Dependency**: Requires a character not in alphabet
+4. **Cache Performance**: May have worse cache locality than some algorithms
+
+## Applications
+
+### 1. Pattern Matching
+- Finding all occurrences of a pattern in text
+- Multiple pattern search (with modifications)
+
+### 2. String Processing
+- Finding periods of a string
+- Longest palindromic substring
+- String compression
+- Suffix array construction
+
+### 3. Bioinformatics
+- DNA sequence analysis
+- Protein sequence matching
+- Genome assembly
+
+### 4. Text Processing
+- Plagiarism detection
+- Document similarity
+- Data deduplication
+
+## Related Problems
+
+### 1. Finding All Palindromes
+```python
+def find_palindromes_z(s):
+    # Reverse string and find common substrings
+    rev_s = s[::-1]
+    combined = s + "$" + rev_s
+    z = z_algorithm(combined)
+    # Process Z array to find palindromes
+```
+
+### 2. Period of String
+```python
+def find_period_z(s):
+    z = z_algorithm(s)
+    n = len(s)
+    for i in range(1, n):
+        if i + z[i] == n:
+            return i  # Period found
+    return n  # No period
+```
+
+### 3. String Compression
+```python
+def compress_string_z(s):
+    z = z_algorithm(s)
+    # Use Z array to find repeating patterns
+    # Implement compression logic
+```
+
+## Comparison with Other Algorithms
+
+| Algorithm | Time | Space | Preprocessing | Best For | 
+|-----------|------|-------|---------------|----------|
+| Z Algorithm | O(n+m) | O(n+m) | O(m) | Simple implementation |
+| KMP | O(n+m) | O(m) | O(m) | Space efficiency |
+| Rabin-Karp | O(n+m)* | O(1) | O(m) | Multiple patterns |
+| Boyer-Moore | O(n/m) | O(σ) | O(m+σ) | Long patterns |
+| Naive | O(nm) | O(1) | O(1) | Very short patterns |
+
+*Average case for Rabin-Karp
+
+## Advanced Topics
+
+### 1. Z Algorithm Variants
+- Online Z algorithm for streaming data
+- Parallel Z algorithm implementation
+- Z algorithm for circular strings
+
+### 2. Optimization Techniques
+- Memory-efficient implementation
+- SIMD optimizations
+- Cache-friendly versions
+
+### 3. Extended Applications
+- Suffix array construction using Z algorithm
+- Longest common substring
+- Approximate string matching
+
+## Practice Problems
+
+1. **Basic**: Find all occurrences of pattern in text
+2. **Intermediate**: Find longest palindromic substring
+3. **Advanced**: String periodicity and compression
+4. **Expert**: Multiple pattern matching with Z algorithm
+
+## Interview Questions
+
+1. Explain how Z algorithm works with an example
+2. Why is Z algorithm linear time?
+3. Compare Z algorithm with KMP
+4. How to find the period of a string using Z algorithm?
+5. Implement Z algorithm without extra space
+
+## Key Points to Remember
+
+- Z[i] represents length of longest prefix match starting at position i
+- Algorithm uses Z-box optimization to achieve linear time
+- Requires concatenation with separator for pattern matching
+- Simpler to implement and understand than KMP
+- Versatile for various string processing problems
+- Always runs in O(n) time regardless of input pattern

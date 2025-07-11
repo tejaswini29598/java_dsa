@@ -1,4 +1,4 @@
-import java.lang.*;
+
 import java.util.*;
 class Node {
     int data;
@@ -48,5 +48,6 @@ public class LevelOrderTraversal {
         for (int i = 0; i < N; i++) arr[i] = sc.nextInt();
         Node root = buildTreeMain(arr);
         levelOrderMain(root);
+        sc.close();
     }
 }

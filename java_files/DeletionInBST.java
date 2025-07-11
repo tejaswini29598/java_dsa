@@ -14,7 +14,7 @@ public class DeletionInBST {
         else root.right = insert(root.right, val);
         return root;
     }
-
+ 
     // Delete a node from BST
     static TreeNode deleteNode(TreeNode root, int key) {
         if (root == null) return null;
