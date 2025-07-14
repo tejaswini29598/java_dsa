@@ -6443,3 +6443,2261 @@ def compress_string_z(s):
 - Simpler to implement and understand than KMP
 - Versatile for various string processing problems
 - Always runs in O(n) time regardless of input pattern
+
+//12/7/25 (day 19) //
+# Segment Tree - Complete Guide
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Basic Concepts](#basic-concepts)
+3. [Structure and Properties](#structure-and-properties)
+4. [Basic Operations](#basic-operations)
+5. [Implementation](#implementation)
+6. [Advanced Topics](#advanced-topics)
+7. [Applications](#applications)
+8. [Practice Problems](#practice-problems)
+
+---
+
+## Introduction
+
+A **Segment Tree** is a binary tree data structure used for storing information about array segments in a way that allows answering range queries efficiently. It's particularly useful when you need to perform multiple queries on ranges of an array and/or update elements frequently.
+
+### Key Features
+- **Efficient Range Queries**: O(log n) time complexity
+- **Efficient Point Updates**: O(log n) time complexity
+- **Flexible Operations**: Can handle sum, min, max, GCD, LCM, etc.
+- **Range Updates**: With lazy propagation, range updates are also O(log n)
+
+### Time Complexity
+| Operation | Time Complexity |
+|-----------|----------------|
+| Build | O(n) |
+| Point Update | O(log n) |
+| Range Query | O(log n) |
+| Range Update (with lazy) | O(log n) |
+
+### Space Complexity
+- **Space**: O(4n) ≈ O(n)
+
+---
+
+## Basic Concepts
+
+### Problem Statement
+Given an array `arr[]` of size `n`, we need to efficiently:
+1. Find the sum/min/max of elements in a given range `[l, r]`
+2. Update the value of any element in the array
+
+### Naive Approach vs Segment Tree
+```
+Naive Approach:
+- Range Query: O(n)
+- Point Update: O(1)
+
+Segment Tree:
+- Range Query: O(log n)
+- Point Update: O(log n)
+```
+
+### Tree Structure
+- Each node represents a segment/range of the array
+- Leaf nodes represent individual array elements
+- Internal nodes represent the union of child segments
+- Root node represents the entire array
+
+---
+
+## Structure and Properties
+
+### Tree Representation
+```
+Array: [1, 3, 5, 7, 9, 11]
+Index:  0  1  2  3  4  5
+
+Segment Tree (Sum):
+                    36[0,5]
+                   /        \
+              9[0,2]          27[3,5]
+             /      \        /        \
+        4[0,1]      5[2,2]  7[3,3]    20[4,5]
+       /      \                      /        \
+   1[0,0]   3[1,1]              9[4,4]    11[5,5]
+```
+
+### Node Properties
+- **Internal Node**: `tree[node] = tree[2*node] + tree[2*node+1]`
+- **Leaf Node**: `tree[node] = arr[index]`
+- **Range**: Each node covers range `[start, end]`
+
+### Array Indexing
+- For 0-based indexing: Use indices 0 to n-1
+- Tree array size: 4*n (to handle all possible nodes)
+
+---
+
+## Basic Operations
+
+### 1. Build Operation
+```java
+void build(int[] arr, int node, int start, int end) {
+    if (start == end) {
+        // Leaf node
+        tree[node] = arr[start];
+    } else {
+        int mid = (start + end) / 2;
+        // Build left subtree
+        build(arr, 2*node, start, mid);
+        // Build right subtree
+        build(arr, 2*node+1, mid+1, end);
+        // Internal node value
+        tree[node] = tree[2*node] + tree[2*node+1];
+    }
+}
+```
+
+### 2. Point Update
+```java
+void update(int node, int start, int end, int idx, int val) {
+    if (start == end) {
+        // Leaf node - update value
+        tree[node] = val;
+    } else {
+        int mid = (start + end) / 2;
+        if (idx <= mid) {
+            // Update left subtree
+            update(2*node, start, mid, idx, val);
+        } else {
+            // Update right subtree
+            update(2*node+1, mid+1, end, idx, val);
+        }
+        // Update current node
+        tree[node] = tree[2*node] + tree[2*node+1];
+    }
+}
+```
+
+### 3. Range Query
+```java
+int query(int node, int start, int end, int l, int r) {
+    if (r < start || end < l) {
+        // No overlap
+        return 0;
+    }
+    if (l <= start && end <= r) {
+        // Complete overlap
+        return tree[node];
+    }
+    // Partial overlap
+    int mid = (start + end) / 2;
+    int leftSum = query(2*node, start, mid, l, r);
+    int rightSum = query(2*node+1, mid+1, end, l, r);
+    return leftSum + rightSum;
+}
+```
+
+---
+
+## Implementation
+
+### Complete Segment Tree Class
+```java
+class SegmentTree {
+    private int[] tree;
+    private int n;
+    
+    private void build(int[] arr, int node, int start, int end) {
+        if (start == end) {
+            tree[node] = arr[start];
+        } else {
+            int mid = (start + end) / 2;
+            build(arr, 2*node, start, mid);
+            build(arr, 2*node+1, mid+1, end);
+            tree[node] = tree[2*node] + tree[2*node+1];
+        }
+    }
+    
+    private void update(int node, int start, int end, int idx, int val) {
+        if (start == end) {
+            tree[node] = val;
+        } else {
+            int mid = (start + end) / 2;
+            if (idx <= mid) {
+                update(2*node, start, mid, idx, val);
+            } else {
+                update(2*node+1, mid+1, end, idx, val);
+            }
+            tree[node] = tree[2*node] + tree[2*node+1];
+        }
+    }
+    
+    private int query(int node, int start, int end, int l, int r) {
+        if (r < start || end < l) {
+            return 0; // Return identity element
+        }
+        if (l <= start && end <= r) {
+            return tree[node];
+        }
+        int mid = (start + end) / 2;
+        return query(2*node, start, mid, l, r) + 
+               query(2*node+1, mid+1, end, l, r);
+    }
+
+    public SegmentTree(int[] arr) {
+        n = arr.length;
+        tree = new int[4 * n];
+        build(arr, 1, 0, n - 1);
+    }
+    
+    public void update(int idx, int val) {
+        update(1, 0, n - 1, idx, val);
+    }
+    
+    public int query(int l, int r) {
+        return query(1, 0, n - 1, l, r);
+    }
+}
+```
+
+### Usage Example
+```java
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {1, 3, 5, 7, 9, 11};
+        SegmentTree st = new SegmentTree(arr);
+        
+        // Query sum of range [1, 3]
+        System.out.println(st.query(1, 3)); // Output: 15
+        
+        // Update index 1 to value 10
+        st.update(1, 10);
+        
+        // Query again
+        System.out.println(st.query(1, 3)); // Output: 22
+    }
+}
+```
+
+---
+
+## Advanced Topics
+
+### 1. Different Operations
+
+#### Range Minimum Query (RMQ)
+```java
+class RMQSegmentTree {
+    private int[] tree;
+    
+    private void build(int[] arr, int node, int start, int end) {
+        if (start == end) {
+            tree[node] = arr[start];
+        } else {
+            int mid = (start + end) / 2;
+            build(arr, 2*node, start, mid);
+            build(arr, 2*node+1, mid+1, end);
+            tree[node] = Math.min(tree[2*node], tree[2*node+1]);
+        }
+    }
+    
+    private int query(int node, int start, int end, int l, int r) {
+        if (r < start || end < l) {
+            return Integer.MAX_VALUE; // Return infinity for min
+        }
+        if (l <= start && end <= r) {
+            return tree[node];
+        }
+        int mid = (start + end) / 2;
+        return Math.min(query(2*node, start, mid, l, r),
+                       query(2*node+1, mid+1, end, l, r));
+    }
+}
+```
+
+#### Range Maximum Query
+```java
+// Similar to RMQ but use Math.max() instead of Math.min()
+// Return Integer.MIN_VALUE for no overlap case
+```
+
+#### Range GCD Query
+```java
+int gcd(int a, int b) {
+    return b == 0 ? a : gcd(b, a % b);
+}
+
+// In build and query functions, use gcd() instead of +
+tree[node] = gcd(tree[2*node], tree[2*node+1]);
+```
+
+### 2. Lazy Propagation
+
+For efficient range updates, we use lazy propagation:
+
+```java
+class LazySegmentTree {
+    private long[] tree, lazy;
+    
+    private void push(int node, int start, int end) {
+        if (lazy[node] != 0) {
+            tree[node] += lazy[node] * (end - start + 1);
+            if (start != end) {
+                lazy[2*node] += lazy[node];
+                lazy[2*node+1] += lazy[node];
+            }
+            lazy[node] = 0;
+        }
+    }
+    
+    private void updateRange(int node, int start, int end, int l, int r, int val) {
+        push(node, start, end);
+        if (start > r || end < l) return;
+        
+        if (start >= l && end <= r) {
+            lazy[node] += val;
+            push(node, start, end);
+            return;
+        }
+        
+        int mid = (start + end) / 2;
+        updateRange(2*node, start, mid, l, r, val);
+        updateRange(2*node+1, mid+1, end, l, r, val);
+        
+        push(2*node, start, mid);
+        push(2*node+1, mid+1, end);
+        tree[node] = tree[2*node] + tree[2*node+1];
+    }
+}
+```
+
+### 3. 2D Segment Tree
+
+For 2D range queries:
+```java
+class SegmentTree2D {
+    private int[][] tree;
+    private int[][] arr;  // 2D input array
+    private int n, m;
+    
+    private void buildY(int vx, int lx, int rx, int vy, int ly, int ry) {
+        if (ly == ry) {
+            if (lx == rx) {
+                tree[vx][vy] = arr[lx][ly];
+            } else {
+                tree[vx][vy] = tree[2*vx][vy] + tree[2*vx+1][vy];
+            }
+        } else {
+            int my = (ly + ry) / 2;
+            buildY(vx, lx, rx, 2*vy, ly, my);
+            buildY(vx, lx, rx, 2*vy+1, my+1, ry);
+            tree[vx][vy] = tree[vx][2*vy] + tree[vx][2*vy+1];
+        }
+    }
+    
+    private void buildX(int vx, int lx, int rx) {
+        if (lx != rx) {
+            int mx = (lx + rx) / 2;
+            buildX(2*vx, lx, mx);
+            buildX(2*vx+1, mx+1, rx);
+        }
+        buildY(vx, lx, rx, 1, 0, m-1);
+    }
+}
+```
+
+---
+
+## Applications
+
+### 1. Range Sum Queries
+- **Problem**: Answer multiple queries for sum of elements in range [l, r]
+- **Solution**: Basic segment tree with sum operation
+
+### 2. Range Minimum/Maximum Queries
+- **Problem**: Find minimum/maximum element in range [l, r]
+- **Solution**: Segment tree with min/max operations
+
+### 3. Range GCD Queries
+- **Problem**: Find GCD of all elements in range [l, r]
+- **Solution**: Segment tree with GCD operation
+
+### 4. Count of Elements in Range
+- **Problem**: Count elements in range [l, r] that satisfy certain condition
+- **Solution**: Segment tree storing count information
+
+### 5. Range Updates with Range Queries
+- **Problem**: Add value to all elements in range [l, r] and answer sum queries
+- **Solution**: Lazy propagation segment tree
+
+### 6. Persistent Segment Tree
+- **Problem**: Maintain multiple versions of segment tree
+- **Solution**: Create new nodes only when needed
+
+---
+
+## Practice Problems
+
+### Beginner Level
+1. **Range Sum Query - Immutable**
+   - Build segment tree and answer range sum queries
+   - No updates required
+
+2. **Range Minimum Query**
+   - Find minimum element in given range
+   - Static array, no updates
+
+3. **Point Update Range Sum**
+   - Update single element and answer range sum queries
+
+### Intermediate Level
+4. **Range Update Range Sum**
+   - Add value to range [l, r] and answer sum queries
+   - Use lazy propagation
+
+5. **Range GCD Query**
+   - Find GCD of elements in range [l, r]
+
+6. **Count of Elements**
+   - Count elements in range [l, r] that are greater than x
+
+### Advanced Level
+7. **Persistent Segment Tree**
+   - Maintain multiple versions of the tree
+
+8. **2D Range Sum Query**
+   - Answer sum queries on 2D matrix
+
+9. **Dynamic Range Queries**
+   - Handle coordinate compression for large ranges
+
+---
+
+## Tips and Tricks
+
+### 1. Implementation Tips
+- Use 1-based indexing for tree array (easier to calculate children)
+- Tree size should be 4*n to handle all nodes
+- Be careful with data types (use long for large sums)
+
+### 2. Debugging Tips
+- Print tree structure to visualize
+- Test with small examples first
+- Check boundary conditions
+
+### 3. Optimization Tips
+- Use iterative approach for better constants
+- Cache-friendly memory access patterns
+- Avoid unnecessary recursive calls
+
+### 4. Common Mistakes
+- Incorrect tree size allocation
+- Wrong indexing (0-based vs 1-based)
+- Not handling edge cases properly
+- Integer overflow in sum operations
+
+---
+
+## Complexity Analysis
+
+### Time Complexity
+- **Build**: O(n) - Visit each node once
+- **Query**: O(log n) - Visit at most 4 nodes per level
+- **Update**: O(log n) - Single path from root to leaf
+- **Range Update (Lazy)**: O(log n) - Amortized
+
+### Space Complexity
+- **Tree Storage**: O(4n) ≈ O(n)
+- **Lazy Array**: O(4n) for lazy propagation
+- **Recursion Stack**: O(log n)
+
+### Comparison with Other Data Structures
+| Data Structure | Build | Query | Update | Space |
+|---------------|-------|-------|---------|-------|
+| Array | O(1) | O(n) | O(1) | O(n) |
+| Prefix Sum | O(n) | O(1) | O(n) | O(n) |
+| Segment Tree | O(n) | O(log n) | O(log n) | O(n) |
+| Fenwick Tree | O(n log n) | O(log n) | O(log n) | O(n) |
+
+---
+
+## Conclusion
+
+Segment Trees are powerful data structures that provide efficient solutions for range query problems. They offer a good balance between query time and update time, making them suitable for many competitive programming problems and real-world applications.
+
+**Key Takeaways:**
+- Master the basic operations: build, query, update
+- Understand lazy propagation for range updates
+- Practice with different operations (sum, min, max, GCD)
+- Learn to identify when segment trees are the right choice
+
+**Next Steps:**
+- Practice implementation from scratch
+- Solve problems with different operations
+- Learn about persistent and 2D segment trees
+- Explore advanced applications and optimizations
+
+# Segment Tree with Lazy Propagation - Complete Guide
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Why Lazy Propagation?](#why-lazy-propagation)
+3. [Core Concepts](#core-concepts)
+4. [Basic Implementation](#basic-implementation)
+5. [Advanced Implementations](#advanced-implementations)
+6. [Types of Lazy Propagation](#types-of-lazy-propagation)
+7. [Common Patterns](#common-patterns)
+8. [Applications](#applications)
+9. [Practice Problems](#practice-problems)
+10. [Optimization Techniques](#optimization-techniques)
+
+---
+
+## Introduction
+
+**Lazy Propagation** is an optimization technique used with segment trees to handle range updates efficiently. Without lazy propagation, updating a range [l, r] would require O(n log n) time in the worst case. With lazy propagation, we can perform range updates in O(log n) time.
+
+### Key Idea
+Instead of immediately updating all nodes affected by a range update, we **defer** (make lazy) the updates and apply them only when we actually need to visit those nodes.
+
+### Time Complexity Comparison
+| Operation | Without Lazy | With Lazy |
+|-----------|-------------|-----------|
+| Range Update | O(n log n) | O(log n) |
+| Range Query | O(log n) | O(log n) |
+| Point Update | O(log n) | O(log n) |
+
+---
+
+## Why Lazy Propagation?
+
+### Problem with Regular Segment Tree
+```java
+// Without lazy propagation
+void updateRange(int node, int start, int end, int l, int r, int val) {
+    if (start > r || end < l) return;
+    
+    if (start == end) {
+        tree[node] += val;
+        return;
+    }
+    
+    int mid = (start + end) / 2;
+    updateRange(2*node, start, mid, l, r, val);
+    updateRange(2*node+1, mid+1, end, l, r, val);
+    tree[node] = tree[2*node] + tree[2*node+1];
+}
+```
+**Problem**: This updates O(n) nodes in worst case, leading to O(n log n) complexity.
+
+### Solution: Lazy Propagation
+```java
+// With lazy propagation
+void updateRange(int node, int start, int end, int l, int r, int val) {
+    push(node, start, end);  // Apply pending updates
+    
+    if (start > r || end < l) return;
+    
+    if (start >= l && end <= r) {
+        lazy[node] += val;    // Mark as lazy
+        push(node, start, end);  // Apply immediately
+        return;
+    }
+    
+    int mid = (start + end) / 2;
+    updateRange(2*node, start, mid, l, r, val);
+    updateRange(2*node+1, mid+1, end, l, r, val);
+    
+    push(2*node, start, mid);
+    push(2*node+1, mid+1, end);
+    tree[node] = tree[2*node] + tree[2*node+1];
+}
+```
+**Advantage**: Only visits O(log n) nodes, achieving O(log n) complexity.
+
+---
+
+## Core Concepts
+
+### 1. Lazy Array
+```java
+long[] lazy;  // Stores pending updates
+```
+- **Purpose**: Store updates that haven't been applied to children yet
+- **Size**: Same as tree array (4 * n)
+- **Initialization**: All zeros initially
+
+### 2. Push Operation
+```java
+void push(int node, int start, int end) {
+    if (lazy[node] != 0) {
+        // Apply lazy update to current node
+        tree[node] += lazy[node] * (end - start + 1);
+        
+        // Propagate to children (if not leaf)
+        if (start != end) {
+            lazy[2*node] += lazy[node];
+            lazy[2*node+1] += lazy[node];
+        }
+        
+        // Clear lazy value
+        lazy[node] = 0;
+    }
+}
+```
+
+### 3. Update Strategy
+1. **Push** pending updates before any operation
+2. **Check** if current range is completely within update range
+3. **Mark lazy** if complete overlap
+4. **Recurse** if partial overlap
+5. **Update parent** after children are processed
+
+---
+
+## Basic Implementation
+
+### Range Addition + Range Sum Query
+```java
+class LazySegmentTree {
+    private long[] tree, lazy;
+    private int n;
+    
+    private void push(int node, int start, int end) {
+        if (lazy[node] != 0) {
+            // Apply pending update
+            tree[node] += lazy[node] * (end - start + 1);
+            
+            // Propagate to children
+            if (start != end) {
+                lazy[2*node] += lazy[node];
+                lazy[2*node+1] += lazy[node];
+            }
+            
+            // Clear lazy flag
+            lazy[node] = 0;
+        }
+    }
+    
+    private void build(int[] arr, int node, int start, int end) {
+        if (start == end) {
+            tree[node] = arr[start];
+        } else {
+            int mid = (start + end) / 2;
+            build(arr, 2*node, start, mid);
+            build(arr, 2*node+1, mid+1, end);
+            tree[node] = tree[2*node] + tree[2*node+1];
+        }
+    }
+    
+    private void updateRange(int node, int start, int end, int l, int r, int val) {
+        push(node, start, end);  // Apply pending updates
+        
+        if (start > r || end < l) return;  // No overlap
+        
+        if (start >= l && end <= r) {  // Complete overlap
+            lazy[node] += val;
+            push(node, start, end);
+            return;
+        }
+        
+        // Partial overlap
+        int mid = (start + end) / 2;
+        updateRange(2*node, start, mid, l, r, val);
+        updateRange(2*node+1, mid+1, end, l, r, val);
+        
+        // Update current node
+        push(2*node, start, mid);
+        push(2*node+1, mid+1, end);
+        tree[node] = tree[2*node] + tree[2*node+1];
+    }
+    
+    private long queryRange(int node, int start, int end, int l, int r) {
+        if (start > r || end < l) return 0;  // No overlap
+        
+        push(node, start, end);  // Apply pending updates
+        
+        if (start >= l && end <= r) {  // Complete overlap
+            return tree[node];
+        }
+        
+        // Partial overlap
+        int mid = (start + end) / 2;
+        return queryRange(2*node, start, mid, l, r) + 
+               queryRange(2*node+1, mid+1, end, l, r);
+    }
+    
+    public LazySegmentTree(int[] arr) {
+        n = arr.length;
+        tree = new long[4 * n];
+        lazy = new long[4 * n];
+        build(arr, 1, 0, n - 1);
+    }
+    
+    public void updateRange(int l, int r, int val) {
+        updateRange(1, 0, n - 1, l, r, val);
+    }
+    
+    public long queryRange(int l, int r) {
+        return queryRange(1, 0, n - 1, l, r);
+    }
+}
+```
+
+### Usage Example
+```java
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5};
+        LazySegmentTree lst = new LazySegmentTree(arr);
+        
+        System.out.println(lst.queryRange(0, 2));  // Output: 6
+        
+        lst.updateRange(1, 3, 10);  // Add 10 to range [1, 3]
+        
+        System.out.println(lst.queryRange(0, 2));  // Output: 26
+        System.out.println(lst.queryRange(2, 4));  // Output: 42
+    }
+}
+```
+
+---
+
+## Advanced Implementations
+
+### 1. Range Set + Range Sum Query
+```java
+class LazySetSegmentTree {
+    private long[] tree, lazy;
+    private boolean[] hasLazy;
+    private int n;
+    
+    private void push(int node, int start, int end) {
+        if (hasLazy[node]) {
+            tree[node] = lazy[node] * (end - start + 1);
+            
+            if (start != end) {
+                lazy[2*node] = lazy[node];
+                lazy[2*node+1] = lazy[node];
+                hasLazy[2*node] = hasLazy[2*node+1] = true;
+            }
+            
+            hasLazy[node] = false;
+        }
+    }
+    
+    private void updateRange(int node, int start, int end, int l, int r, int val) {
+        push(node, start, end);
+        
+        if (start > r || end < l) return;
+        
+        if (start >= l && end <= r) {
+            lazy[node] = val;
+            hasLazy[node] = true;
+            push(node, start, end);
+            return;
+        }
+        
+        int mid = (start + end) / 2;
+        updateRange(2*node, start, mid, l, r, val);
+        updateRange(2*node+1, mid+1, end, l, r, val);
+        
+        push(2*node, start, mid);
+        push(2*node+1, mid+1, end);
+        tree[node] = tree[2*node] + tree[2*node+1];
+    }
+    
+    public LazySetSegmentTree(int size) {
+        n = size;
+        tree = new long[4 * size];
+        lazy = new long[4 * size];
+        hasLazy = new boolean[4 * size];
+    }
+    
+    public void setRange(int l, int r, int val) {
+        updateRange(1, 0, n - 1, l, r, val);
+    }
+}
+```
+
+### 2. Range Min/Max with Range Addition
+```java
+class LazyMinSegmentTree {
+    private int[] tree, lazy;
+    private int n;
+    
+    private void push(int node, int start, int end) {
+        if (lazy[node] != 0) {
+            tree[node] += lazy[node];
+            
+            if (start != end) {
+                lazy[2*node] += lazy[node];
+                lazy[2*node+1] += lazy[node];
+            }
+            
+            lazy[node] = 0;
+        }
+    }
+    
+    private void updateRange(int node, int start, int end, int l, int r, int val) {
+        push(node, start, end);
+        
+        if (start > r || end < l) return;
+        
+        if (start >= l && end <= r) {
+            lazy[node] += val;
+            push(node, start, end);
+            return;
+        }
+        
+        int mid = (start + end) / 2;
+        updateRange(2*node, start, mid, l, r, val);
+        updateRange(2*node+1, mid+1, end, l, r, val);
+        
+        push(2*node, start, mid);
+        push(2*node+1, mid+1, end);
+        tree[node] = Math.min(tree[2*node], tree[2*node+1]);
+    }
+    
+    private int queryRange(int node, int start, int end, int l, int r) {
+        if (start > r || end < l) return Integer.MAX_VALUE;
+        
+        push(node, start, end);
+        
+        if (start >= l && end <= r) {
+            return tree[node];
+        }
+        
+        int mid = (start + end) / 2;
+        return Math.min(queryRange(2*node, start, mid, l, r),
+                       queryRange(2*node+1, mid+1, end, l, r));
+    }
+}
+```
+
+### 3. Multiple Operations (Add + Multiply)
+```java
+class LazyMultiOpSegmentTree {
+    private static class LazyData {
+        long addVal = 0;
+        long mulVal = 1;
+        
+        void combine(LazyData other) {
+            addVal = addVal * other.mulVal + other.addVal;
+            mulVal = mulVal * other.mulVal;
+        }
+    }
+    
+    private long[] tree;
+    private LazyData[] lazy;
+    private int n;
+    
+    private void push(int node, int start, int end) {
+        if (lazy[node].addVal != 0 || lazy[node].mulVal != 1) {
+            tree[node] = tree[node] * lazy[node].mulVal + 
+                        lazy[node].addVal * (end - start + 1);
+            
+            if (start != end) {
+                lazy[2*node].combine(lazy[node]);
+                lazy[2*node+1].combine(lazy[node]);
+            }
+            
+            lazy[node] = new LazyData();
+        }
+    }
+    
+    private void addRange(int node, int start, int end, int l, int r, int val) {
+        push(node, start, end);
+        
+        if (start > r || end < l) return;
+        
+        if (start >= l && end <= r) {
+            lazy[node].addVal += val;
+            push(node, start, end);
+            return;
+        }
+        
+        int mid = (start + end) / 2;
+        addRange(2*node, start, mid, l, r, val);
+        addRange(2*node+1, mid+1, end, l, r, val);
+        
+        push(2*node, start, mid);
+        push(2*node+1, mid+1, end);
+        tree[node] = tree[2*node] + tree[2*node+1];
+    }
+    
+    private void mulRange(int node, int start, int end, int l, int r, int val) {
+        push(node, start, end);
+        
+        if (start > r || end < l) return;
+        
+        if (start >= l && end <= r) {
+            lazy[node].mulVal *= val;
+            lazy[node].addVal *= val;
+            push(node, start, end);
+            return;
+        }
+        
+        int mid = (start + end) / 2;
+        mulRange(2*node, start, mid, l, r, val);
+        mulRange(2*node+1, mid+1, end, l, r, val);
+        
+        push(2*node, start, mid);
+        push(2*node+1, mid+1, end);
+        tree[node] = tree[2*node] + tree[2*node+1];
+    }
+    
+    public void addRange(int l, int r, int val) {
+        addRange(1, 0, n - 1, l, r, val);
+    }
+    
+    public void mulRange(int l, int r, int val) {
+        mulRange(1, 0, n - 1, l, r, val);
+    }
+}
+```
+
+---
+
+## Types of Lazy Propagation
+
+### 1. Range Addition
+```java
+// Add val to all elements in range [l, r]
+lazy[node] += val;
+tree[node] += val * (end - start + 1);
+```
+
+### 2. Range Set
+```java
+// Set all elements in range [l, r] to val
+lazy[node] = val;
+hasLazy[node] = true;
+tree[node] = val * (end - start + 1);
+```
+
+### 3. Range Multiplication
+```java
+// Multiply all elements in range [l, r] by val
+lazy[node] *= val;
+tree[node] *= val;
+```
+
+### 4. Range XOR
+```java
+// XOR all elements in range [l, r] with val
+lazy[node] ^= val;
+// For sum queries, need to handle count of 1s
+```
+
+### 5. Range Flip (Boolean)
+```java
+// Flip all bits in range [l, r]
+lazy[node] = !lazy[node];
+tree[node] = (end - start + 1) - tree[node];
+```
+
+---
+
+## Common Patterns
+
+### 1. Template for Range Addition
+```java
+class LazySegmentTree<T> {
+    private T[] tree, lazy;
+    private int n;
+    
+    private void push(int node, int start, int end) {
+        if (!lazy[node].equals(getZero())) {
+            tree[node] = add(tree[node], multiply(lazy[node], end - start + 1));
+            if (start != end) {
+                lazy[2*node] = add(lazy[2*node], lazy[node]);
+                lazy[2*node+1] = add(lazy[2*node+1], lazy[node]);
+            }
+            lazy[node] = getZero();
+        }
+    }
+    
+    private void updateRange(int node, int start, int end, int l, int r, T val) {
+        push(node, start, end);
+        if (start > r || end < l) return;
+        if (start >= l && end <= r) {
+            lazy[node] = add(lazy[node], val);
+            push(node, start, end);
+            return;
+        }
+        int mid = (start + end) / 2;
+        updateRange(2*node, start, mid, l, r, val);
+        updateRange(2*node+1, mid+1, end, l, r, val);
+        push(2*node, start, mid);
+        push(2*node+1, mid+1, end);
+        tree[node] = add(tree[2*node], tree[2*node+1]);
+    }
+    
+    private T queryRange(int node, int start, int end, int l, int r) {
+        if (start > r || end < l) return getZero();
+        push(node, start, end);
+        if (start >= l && end <= r) return tree[node];
+        int mid = (start + end) / 2;
+        return add(queryRange(2*node, start, mid, l, r),
+                  queryRange(2*node+1, mid+1, end, l, r));
+    }
+    
+    public LazySegmentTree(T[] arr) {
+        n = arr.length;
+        tree = (T[]) new Object[4 * n];
+        lazy = (T[]) new Object[4 * n];
+        Arrays.fill(lazy, getZero());
+        build(arr, 1, 0, n - 1);
+    }
+    
+    public void updateRange(int l, int r, T val) {
+        updateRange(1, 0, n - 1, l, r, val);
+    }
+    
+    public T queryRange(int l, int r) {
+        return queryRange(1, 0, n - 1, l, r);
+    }
+    
+    // Abstract methods to be implemented for specific types
+    protected abstract T getZero();
+    protected abstract T add(T a, T b);
+    protected abstract T multiply(T a, int b);
+}
+```
+
+### 2. Handling Multiple Update Types
+```java
+class LazyNode {
+    long addVal = 0;
+    long setVal = 0;
+    boolean hasSet = false;
+    
+    void applyAdd(long val) {
+        if (hasSet) {
+            setVal += val;
+        } else {
+            addVal += val;
+        }
+    }
+    
+    void applySet(long val) {
+        setVal = val;
+        hasSet = true;
+        addVal = 0;
+    }
+    
+    void propagate(LazyNode child) {
+        if (hasSet) {
+            child.applySet(setVal);
+        } else if (addVal != 0) {
+            child.applyAdd(addVal);
+        }
+    }
+}
+```
+
+---
+
+## Applications
+
+### 1. Range Increment + Range Sum
+```java
+// Problem: Support operations:
+// 1. Add val to all elements in range [l, r]
+// 2. Find sum of elements in range [l, r]
+
+LazySegmentTree lst = new LazySegmentTree(arr);
+lst.updateRange(1, 3, 5);  // Add 5 to range [1, 3]
+System.out.println(lst.queryRange(0, 4));  // Sum of range [0, 4]
+```
+
+### 2. Range Set + Range Maximum
+```java
+// Problem: Support operations:
+// 1. Set all elements in range [l, r] to val
+// 2. Find maximum element in range [l, r]
+
+class LazyMaxSegmentTree {
+    // Implementation similar to sum but use max operation
+    tree[node] = Math.max(tree[2*node], tree[2*node+1]);
+}
+```
+
+### 3. Rectangle Sum Queries with Updates
+```java
+// Problem: 2D range updates and queries
+// Use 2D lazy segment tree or coordinate compression
+
+class Lazy2DSegmentTree {
+    // Each node of x-tree contains a y-tree
+    // Apply lazy propagation in both dimensions
+}
+```
+
+### 4. Dynamic Range GCD
+```java
+// Problem: Add val to range [l, r] and find GCD of range
+// Challenge: GCD with lazy propagation is complex
+// Solution: Use mathematical properties or square root decomposition
+```
+
+---
+
+## Practice Problems
+
+### Beginner Level
+1. **Range Sum Update**
+   - Add val to range [l, r]
+   - Query sum of range [l, r]
+
+2. **Range Set Update**
+   - Set all elements in range [l, r] to val
+   - Query sum of range [l, r]
+
+3. **Range Increment Range Min**
+   - Add val to range [l, r]
+   - Query minimum in range [l, r]
+
+### Intermediate Level
+4. **Multiple Update Types**
+   - Support both add and set operations
+   - Query sum of range [l, r]
+
+5. **Range Flip**
+   - Flip all bits in range [l, r]
+   - Query count of 1s in range [l, r]
+
+6. **Range Multiplication**
+   - Multiply all elements in range [l, r] by val
+   - Query sum of range [l, r]
+
+### Advanced Level
+7. **Multiple Operations**
+   - Support add, multiply, and set operations
+   - Query sum of range [l, r]
+
+8. **2D Lazy Propagation**
+   - Rectangle updates and queries
+   - Coordinate compression
+
+9. **Persistent Lazy Segment Tree**
+   - Maintain multiple versions with lazy propagation
+
+---
+
+## Optimization Techniques
+
+### 1. Memory Optimization
+```java
+// Use int instead of long when possible
+// Reduce tree size by careful analysis
+int[] tree;
+int[] lazy;
+```
+
+### 2. Constant Factor Optimization
+```java
+// Use bitwise operations for multiplication/division by 2
+int mid = (start + end) >> 1;
+int leftChild = node << 1;
+int rightChild = (node << 1) | 1;
+```
+
+### 3. Iterative Implementation
+```java
+// For better cache performance and avoiding recursion overhead
+class IterativeLazySegmentTree {
+    // Bottom-up approach
+    // More complex but faster
+}
+```
+
+### 4. Coordinate Compression
+```java
+// For sparse ranges
+class CompressedLazySegmentTree {
+    Map<Integer, Integer> compress = new HashMap<>();
+    List<Integer> decompress = new ArrayList<>();
+    
+    void coordinateCompress(int[] coords) {
+        Arrays.sort(coords);
+        int[] uniqueCoords = Arrays.stream(coords).distinct().toArray();
+        
+        for (int i = 0; i < uniqueCoords.length; i++) {
+            compress.put(uniqueCoords[i], i);
+            decompress.add(uniqueCoords[i]);
+        }
+    }
+}
+```
+
+---
+
+## Common Pitfalls and Solutions
+
+### 1. Forgetting to Push
+```java
+// WRONG: Query without pushing
+int query(int node, int start, int end, int l, int r) {
+    if (start >= l && end <= r) return tree[node];
+    // ... rest of function
+}
+
+// CORRECT: Always push before accessing
+int query(int node, int start, int end, int l, int r) {
+    push(node, start, end);  // Always push first
+    if (start >= l && end <= r) return tree[node];
+    // ... rest of function
+}
+```
+
+### 2. Incorrect Lazy Combination
+```java
+// WRONG: Direct assignment
+lazy[child] = lazy[parent];
+
+// CORRECT: Proper combination
+lazy[child] += lazy[parent];  // For addition
+lazy[child] *= lazy[parent];  // For multiplication
+```
+
+### 3. Integer Overflow
+```java
+// WRONG: Using int for large sums
+int[] tree, lazy;
+
+// CORRECT: Using long
+long[] tree, lazy;
+```
+
+### 4. Index Confusion
+```java
+// WRONG: Mixing 0-based and 1-based indexing
+// Be consistent throughout implementation
+
+// CORRECT: Clear indexing strategy
+// Use 1-based for tree, 0-based for array
+```
+
+---
+
+## Time and Space Complexity
+
+### Time Complexity
+- **Build**: O(n)
+- **Range Update**: O(log n) amortized
+- **Range Query**: O(log n)
+- **Point Update**: O(log n)
+
+### Space Complexity
+- **Tree Array**: O(4n)
+- **Lazy Array**: O(4n)
+- **Total**: O(n)
+
+### Amortized Analysis
+- Each lazy update is pushed down at most once
+- Total work across all operations is bounded
+- Amortized O(log n) per operation
+
+---
+
+## Conclusion
+
+Lazy propagation transforms segment trees from a data structure suitable for point updates to one that handles range updates efficiently. Key takeaways:
+
+1. **Core Concept**: Defer updates until necessary
+2. **Push Operation**: Always apply pending updates before accessing nodes
+3. **Range Updates**: Mark complete ranges as lazy instead of updating all nodes
+4. **Flexibility**: Supports various operations (add, set, multiply, etc.)
+5. **Efficiency**: Achieves O(log n) for both updates and queries
+
+### Best Practices
+- Always push before accessing node values
+- Handle lazy propagation consistently across all operations
+- Use appropriate data types to avoid overflow
+- Test with edge cases and large inputs
+- Consider iterative implementations for better performance
+
+### Next Steps
+- Master basic lazy propagation patterns
+- Practice with different update types
+- Learn advanced techniques like 2D lazy propagation
+- Explore persistent lazy segment trees
+- Study real-world applications and optimization techniques
+
+Lazy propagation is a powerful technique that significantly extends the capabilities of segment trees, making them suitable for a wide range of competitive programming problems and real-world applications requiring efficient range operations.
+
+# Fenwick Tree (Binary Indexed Tree) - Complete Guide
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Core Concepts](#core-concepts)
+3. [Mathematical Foundation](#mathematical-foundation)
+4. [Basic Operations](#basic-operations)
+5. [Implementation](#implementation)
+6. [Advanced Variations](#advanced-variations)
+7. [Applications](#applications)
+8. [Comparison with Other Data Structures](#comparison-with-other-data-structures)
+9. [Practice Problems](#practice-problems)
+10. [Optimization Techniques](#optimization-techniques)
+
+---
+
+## Introduction
+
+A **Fenwick Tree** (also known as **Binary Indexed Tree** or **BIT**) is a data structure that can efficiently calculate prefix sums in a table of values. It was introduced by Peter M. Fenwick in 1994 and provides an elegant solution for range sum queries with updates.
+
+### Key Features
+- **Efficient Prefix Sum Queries**: O(log n) time complexity
+- **Efficient Point Updates**: O(log n) time complexity
+- **Space Efficient**: O(n) space complexity
+- **Simple Implementation**: Easier to implement than segment trees
+- **1-based Indexing**: Uses 1-based indexing for cleaner bit manipulation
+
+### Time Complexity
+| Operation | Time Complexity |
+|-----------|----------------|
+| Build | O(n log n) |
+| Point Update | O(log n) |
+| Prefix Sum Query | O(log n) |
+| Range Sum Query | O(log n) |
+
+### Space Complexity
+- **Space**: O(n)
+
+---
+
+## Core Concepts
+
+### Problem Statement
+Given an array `arr[]` of size `n`, we need to efficiently:
+1. Update the value of any element in the array
+2. Calculate the sum of elements from index 1 to i (prefix sum)
+3. Calculate the sum of elements in range [l, r] using prefix sums
+
+### Naive Approach vs Fenwick Tree
+```
+Naive Approach:
+- Prefix Sum Query: O(n)
+- Point Update: O(n) (if maintaining prefix sum array)
+
+Fenwick Tree:
+- Prefix Sum Query: O(log n)
+- Point Update: O(log n)
+```
+
+### Key Insight
+The Fenwick Tree uses the binary representation of indices to determine which elements each tree node is responsible for. Each position in the tree stores the sum of a specific range of elements.
+
+### LSB (Least Significant Bit) Operation
+The core operation in Fenwick Tree is finding the least significant bit:
+```java
+int lsb(int x) {
+    return x & (-x);
+}
+```
+
+This operation determines:
+- **For Update**: Which positions to update
+- **For Query**: Which positions to sum
+
+---
+
+## Mathematical Foundation
+
+### Binary Representation and Ranges
+Each index in the Fenwick Tree is responsible for a range of elements determined by its binary representation.
+
+```
+Index (Binary) | Range Covered | Tree[index] stores
+1 (001)        | [1, 1]       | arr[1]
+2 (010)        | [1, 2]       | arr[1] + arr[2]
+3 (011)        | [3, 3]       | arr[3]
+4 (100)        | [1, 4]       | arr[1] + arr[2] + arr[3] + arr[4]
+5 (101)        | [5, 5]       | arr[5]
+6 (110)        | [5, 6]       | arr[5] + arr[6]
+7 (111)        | [7, 7]       | arr[7]
+8 (1000)       | [1, 8]       | arr[1] + ... + arr[8]
+```
+
+### Range Calculation
+For index `i`, the range it covers is `[i - lsb(i) + 1, i]`
+
+### Visual Representation
+```
+Array:  [_, 1, 2, 3, 4, 5, 6, 7, 8]  (1-indexed)
+Index:   0  1  2  3  4  5  6  7  8
+
+Fenwick Tree:
+tree[1] = arr[1]                    = 1
+tree[2] = arr[1] + arr[2]          = 1 + 2 = 3
+tree[3] = arr[3]                    = 3
+tree[4] = arr[1] + arr[2] + arr[3] + arr[4] = 1+2+3+4 = 10
+tree[5] = arr[5]                    = 5
+tree[6] = arr[5] + arr[6]          = 5 + 6 = 11
+tree[7] = arr[7]                    = 7
+tree[8] = arr[1] + ... + arr[8]    = 1+2+3+4+5+6+7+8 = 36
+```
+
+---
+
+## Basic Operations
+
+### 1. Update Operation
+To update element at index `i` by adding `delta`:
+
+```java
+void update(int i, int delta) {
+    for (int idx = i; idx <= n; idx += lsb(idx)) {
+        tree[idx] += delta;
+    }
+}
+```
+
+**Process:**
+1. Start from index `i`
+2. Add `delta` to `tree[i]`
+3. Move to next index: `i + lsb(i)`
+4. Repeat until index exceeds `n`
+
+### 2. Prefix Sum Query
+To find sum from index 1 to `i`:
+
+```java
+int query(int i) {
+    int sum = 0;
+    for (int idx = i; idx > 0; idx -= lsb(idx)) {
+        sum += tree[idx];
+    }
+    return sum;
+}
+```
+
+**Process:**
+1. Start from index `i`
+2. Add `tree[i]` to sum
+3. Move to previous index: `i - lsb(i)`
+4. Repeat until index becomes 0
+
+### 3. Range Sum Query
+To find sum from index `l` to `r`:
+
+```java
+int rangeQuery(int l, int r) {
+    return query(r) - query(l - 1);
+}
+```
+
+---
+
+## Implementation
+
+### Basic Fenwick Tree Implementation
+
+```java
+class FenwickTree {
+    private int[] tree;
+    private int n;
+    
+    // Get least significant bit
+    private int lsb(int x) {
+        return x & (-x);
+    }
+    
+    // Constructor
+    public FenwickTree(int size) {
+        n = size;
+        tree = new int[n + 1]; // 1-indexed
+    }
+    
+    // Constructor with initial array
+    public FenwickTree(int[] arr) {
+        n = arr.length;
+        tree = new int[n + 1];
+        
+        // Build tree
+        for (int i = 0; i < n; i++) {
+            update(i + 1, arr[i]);
+        }
+    }
+    
+    // Update element at index i (1-indexed) by adding delta
+    public void update(int i, int delta) {
+        for (int idx = i; idx <= n; idx += lsb(idx)) {
+            tree[idx] += delta;
+        }
+    }
+    
+    // Get prefix sum from 1 to i
+    public int query(int i) {
+        int sum = 0;
+        for (int idx = i; idx > 0; idx -= lsb(idx)) {
+            sum += tree[idx];
+        }
+        return sum;
+    }
+    
+    // Get range sum from l to r (both inclusive)
+    public int rangeQuery(int l, int r) {
+        return query(r) - query(l - 1);
+    }
+    
+    // Set element at index i to value (not add)
+    public void set(int i, int value) {
+        int currentValue = rangeQuery(i, i);
+        update(i, value - currentValue);
+    }
+    
+    // Get element at index i
+    public int get(int i) {
+        return rangeQuery(i, i);
+    }
+}
+```
+
+### Usage Example
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5};
+        FenwickTree ft = new FenwickTree(arr);
+        
+        // Query prefix sum from 1 to 3
+        System.out.println(ft.query(3)); // Output: 6 (1+2+3)
+        
+        // Query range sum from 2 to 4
+        System.out.println(ft.rangeQuery(2, 4)); // Output: 9 (2+3+4)
+        
+        // Update index 3 by adding 5
+        ft.update(3, 5);
+        
+        // Query again
+        System.out.println(ft.query(3)); // Output: 11 (1+2+8)
+        System.out.println(ft.rangeQuery(2, 4)); // Output: 14 (2+8+4)
+        
+        // Set index 2 to value 10
+        ft.set(2, 10);
+        System.out.println(ft.rangeQuery(1, 3)); // Output: 19 (1+10+8)
+    }
+}
+```
+
+---
+
+## Advanced Variations
+
+### 1. Range Update with Point Query
+
+For range updates, we can use the difference array technique:
+
+```java
+class RangeUpdateFenwickTree {
+    private FenwickTree diff;
+    
+    public RangeUpdateFenwickTree(int size) {
+        diff = new FenwickTree(size);
+    }
+    
+    // Add delta to range [l, r]
+    public void updateRange(int l, int r, int delta) {
+        diff.update(l, delta);
+        diff.update(r + 1, -delta);
+    }
+    
+    // Get value at point i
+    public int pointQuery(int i) {
+        return diff.query(i);
+    }
+}
+```
+
+### 2. Range Update with Range Query
+
+Using two Fenwick Trees:
+
+```java
+class RangeUpdateRangeQueryFenwick {
+    private FenwickTree B1, B2;
+    
+    public RangeUpdateRangeQueryFenwick(int size) {
+        B1 = new FenwickTree(size);
+        B2 = new FenwickTree(size);
+    }
+    
+    // Add delta to range [l, r]
+    public void updateRange(int l, int r, int delta) {
+        B1.update(l, delta);
+        B1.update(r + 1, -delta);
+        B2.update(l, delta * (l - 1));
+        B2.update(r + 1, -delta * r);
+    }
+    
+    // Get sum of range [1, i]
+    public int query(int i) {
+        return B1.query(i) * i - B2.query(i);
+    }
+    
+    // Get sum of range [l, r]
+    public int rangeQuery(int l, int r) {
+        return query(r) - query(l - 1);
+    }
+}
+```
+
+### 3. 2D Fenwick Tree
+
+For 2D prefix sum queries:
+
+```java
+class FenwickTree2D {
+    private int[][] tree;
+    private int n, m;
+    
+    public FenwickTree2D(int rows, int cols) {
+        n = rows;
+        m = cols;
+        tree = new int[n + 1][m + 1];
+    }
+    
+    private int lsb(int x) {
+        return x & (-x);
+    }
+    
+    public void update(int i, int j, int delta) {
+        for (int x = i; x <= n; x += lsb(x)) {
+            for (int y = j; y <= m; y += lsb(y)) {
+                tree[x][y] += delta;
+            }
+        }
+    }
+    
+    public int query(int i, int j) {
+        int sum = 0;
+        for (int x = i; x > 0; x -= lsb(x)) {
+            for (int y = j; y > 0; y -= lsb(y)) {
+                sum += tree[x][y];
+            }
+        }
+        return sum;
+    }
+    
+    public int rangeQuery(int x1, int y1, int x2, int y2) {
+        return query(x2, y2) - query(x1 - 1, y2) - 
+               query(x2, y1 - 1) + query(x1 - 1, y1 - 1);
+    }
+}
+```
+
+### 4. Fenwick Tree with Different Data Types
+
+```java
+class FenwickTreeLong {
+    private long[] tree;
+    private int n;
+    
+    public FenwickTreeLong(int size) {
+        n = size;
+        tree = new long[n + 1];
+    }
+    
+    private int lsb(int x) {
+        return x & (-x);
+    }
+    
+    public void update(int i, long delta) {
+        for (int idx = i; idx <= n; idx += lsb(idx)) {
+            tree[idx] += delta;
+        }
+    }
+    
+    public long query(int i) {
+        long sum = 0;
+        for (int idx = i; idx > 0; idx -= lsb(idx)) {
+            sum += tree[idx];
+        }
+        return sum;
+    }
+    
+    public long rangeQuery(int l, int r) {
+        return query(r) - query(l - 1);
+    }
+}
+```
+
+---
+
+## Applications
+
+### 1. Frequency Counting
+```java
+// Count frequencies in range queries
+public class FrequencyCounter {
+    private FenwickTree ft;
+    
+    public FrequencyCounter(int maxVal) {
+        ft = new FenwickTree(maxVal);
+    }
+    
+    public void addElement(int val) {
+        ft.update(val, 1);
+    }
+    
+    public void removeElement(int val) {
+        ft.update(val, -1);
+    }
+    
+    public int countInRange(int l, int r) {
+        return ft.rangeQuery(l, r);
+    }
+}
+```
+
+### 2. Inversion Count
+```java
+public class InversionCounter {
+    public int countInversions(int[] arr) {
+        int n = arr.length;
+        int maxVal = Arrays.stream(arr).max().getAsInt();
+        FenwickTree ft = new FenwickTree(maxVal);
+        
+        int inversions = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            inversions += ft.query(arr[i] - 1);
+            ft.update(arr[i], 1);
+        }
+        
+        return inversions;
+    }
+}
+```
+
+### 3. Range Minimum Query (Using Coordinate Compression)
+```java
+public class RangeMinQuery {
+    private FenwickTree ft;
+    private int[] values;
+    
+    public RangeMinQuery(int[] arr) {
+        int n = arr.length;
+        values = arr.clone();
+        ft = new FenwickTree(n);
+        
+        // Initialize with indices (coordinate compression)
+        for (int i = 0; i < n; i++) {
+            ft.update(i + 1, i);
+        }
+    }
+    
+    public int rangeMin(int l, int r) {
+        // This is a simplified version
+        // Full implementation requires more complex logic
+        return ft.rangeQuery(l, r);
+    }
+}
+```
+
+### 4. Dynamic Programming Optimization
+```java
+public class DPOptimization {
+    // Example: Longest Increasing Subsequence with Fenwick Tree
+    public int lengthOfLIS(int[] nums) {
+        if (nums.length == 0) return 0;
+        
+        // Coordinate compression
+        int[] sorted = nums.clone();
+        Arrays.sort(sorted);
+        Map<Integer, Integer> compress = new HashMap<>();
+        int idx = 1;
+        for (int num : sorted) {
+            if (!compress.containsKey(num)) {
+                compress.put(num, idx++);
+            }
+        }
+        
+        FenwickTree ft = new FenwickTree(compress.size());
+        int maxLen = 0;
+        
+        for (int num : nums) {
+            int pos = compress.get(num);
+            int len = ft.query(pos - 1) + 1;
+            maxLen = Math.max(maxLen, len);
+            
+            // Update with maximum length ending at this position
+            int currentMax = ft.rangeQuery(pos, pos);
+            if (len > currentMax) {
+                ft.update(pos, len - currentMax);
+            }
+        }
+        
+        return maxLen;
+    }
+}
+```
+
+---
+
+## Comparison with Other Data Structures
+
+### Fenwick Tree vs Segment Tree
+| Feature | Fenwick Tree | Segment Tree |
+|---------|-------------|-------------|
+| **Implementation** | Simpler | More complex |
+| **Memory Usage** | O(n) | O(4n) |
+| **Operations** | Addition only | Any associative operation |
+| **Range Updates** | With difference array | Native support |
+| **Code Length** | Shorter | Longer |
+| **Constants** | Better | Worse |
+
+### Fenwick Tree vs Prefix Sum Array
+| Feature | Fenwick Tree | Prefix Sum Array |
+|---------|-------------|------------------|
+| **Build Time** | O(n log n) | O(n) |
+| **Query Time** | O(log n) | O(1) |
+| **Update Time** | O(log n) | O(n) |
+| **Space** | O(n) | O(n) |
+| **Use Case** | Frequent updates | Static queries |
+
+### When to Use Fenwick Tree
+✅ **Use Fenwick Tree when:**
+- You need prefix sum operations
+- You have frequent updates
+- Memory is a constraint
+- You want simple implementation
+- You're dealing with additive operations
+
+❌ **Don't use Fenwick Tree when:**
+- You need range min/max queries
+- You need complex range operations
+- You need range updates frequently
+- You're working with non-additive operations
+
+---
+
+## Practice Problems
+
+### Beginner Level
+1. **Basic Range Sum Query**
+   - Given array, answer sum queries for ranges [l, r]
+   - Handle point updates
+
+2. **Frequency Queries**
+   - Count frequency of elements in given range
+   - Support adding/removing elements
+
+3. **Prefix Sum with Updates**
+   - Calculate prefix sums with point updates
+   - Basic Fenwick Tree application
+
+### Intermediate Level
+4. **Inversion Count**
+   - Count number of inversions in array
+   - Use Fenwick Tree for efficient counting
+
+5. **Range Update Point Query**
+   - Update range [l, r] by adding value
+   - Query value at specific point
+
+6. **2D Range Sum Query**
+   - Answer sum queries on 2D matrix
+   - Handle 2D point updates
+
+### Advanced Level
+7. **Dynamic Ranking**
+   - Maintain ranking of elements with updates
+   - Support rank queries and updates
+
+8. **Range Update Range Query**
+   - Support both range updates and range queries
+   - Use multiple Fenwick Trees
+
+9. **Offline Query Processing**
+   - Process queries in optimal order
+   - Use Fenwick Tree for efficient computation
+
+---
+
+## Optimization Techniques
+
+### 1. Memory Optimization
+```java
+// Use arrays instead of ArrayList for better performance
+private int[] tree;
+
+// Use appropriate data types
+private long[] tree; // for large sums
+private int[] tree;  // for regular integers
+```
+
+### 2. Constant Factor Optimization
+```java
+// Inline LSB operation
+private int lsb(int x) {
+    return x & (-x);
+}
+
+// Use bit operations where possible
+for (int idx = i; idx <= n; idx += idx & (-idx)) {
+    tree[idx] += delta;
+}
+```
+
+### 3. Coordinate Compression
+```java
+public class CompressedFenwick {
+    private FenwickTree ft;
+    private List<Integer> coords;
+    
+    public CompressedFenwick(int[] values) {
+        // Compress coordinates
+        Set<Integer> uniqueVals = new HashSet<>();
+        for (int val : values) {
+            uniqueVals.add(val);
+        }
+        coords = new ArrayList<>(uniqueVals);
+        Collections.sort(coords);
+        
+        ft = new FenwickTree(coords.size());
+    }
+    
+    private int compress(int val) {
+        return Collections.binarySearch(coords, val) + 1;
+    }
+    
+    public void update(int val, int delta) {
+        ft.update(compress(val), delta);
+    }
+    
+    public int query(int val) {
+        return ft.query(compress(val));
+    }
+}
+```
+
+### 4. Template Implementation
+```java
+public class FenwickTemplate<T> {
+    private T[] tree;
+    private int n;
+    private BinaryOperator<T> operation;
+    private T identity;
+    
+    public FenwickTemplate(int size, BinaryOperator<T> op, T identity) {
+        this.n = size;
+        this.operation = op;
+        this.identity = identity;
+        this.tree = (T[]) new Object[n + 1];
+        Arrays.fill(tree, identity);
+    }
+    
+    public void update(int i, T delta) {
+        for (int idx = i; idx <= n; idx += idx & (-idx)) {
+            tree[idx] = operation.apply(tree[idx], delta);
+        }
+    }
+    
+    public T query(int i) {
+        T result = identity;
+        for (int idx = i; idx > 0; idx -= idx & (-idx)) {
+            result = operation.apply(result, tree[idx]);
+        }
+        return result;
+    }
+}
+```
+
+---
+
+## Common Pitfalls and Solutions
+
+### 1. Index Confusion
+```java
+// WRONG: Using 0-based indexing
+FenwickTree ft = new FenwickTree(n);
+ft.update(0, value); // Error!
+
+// CORRECT: Using 1-based indexing
+FenwickTree ft = new FenwickTree(n);
+ft.update(1, value); // Correct
+```
+
+### 2. Incorrect Range Query
+```java
+// WRONG: Direct range query
+int sum = ft.query(r) - ft.query(l); // Off by one!
+
+// CORRECT: Proper range query
+int sum = ft.query(r) - ft.query(l - 1); // Correct
+```
+
+### 3. Integer Overflow
+```java
+// WRONG: Using int for large sums
+private int[] tree;
+
+// CORRECT: Using long for large sums
+private long[] tree;
+```
+
+### 4. Forgetting to Handle Edge Cases
+```java
+public int rangeQuery(int l, int r) {
+    if (l > r) return 0; // Handle invalid range
+    if (l == 1) return query(r);
+    return query(r) - query(l - 1);
+}
+```
+
+---
+
+## Conclusion
+
+Fenwick Trees are elegant and efficient data structures that excel at prefix sum operations with updates. They offer a perfect balance between simplicity and performance, making them ideal for competitive programming and applications requiring frequent range sum queries.
+
+### Key Takeaways:
+1. **Binary Indexing**: Understanding LSB operation is crucial
+2. **1-based Indexing**: Always use 1-based indexing for cleaner implementation
+3. **Prefix Sums**: Perfect for cumulative operations
+4. **Space Efficient**: Uses only O(n) space
+5. **Simple Code**: Much easier to implement than segment trees
+
+### When to Choose Fenwick Tree:
+- ✅ Prefix sum queries with updates
+- ✅ Memory-constrained environments
+- ✅ Simple additive operations
+- ✅ Competitive programming contests
+- ✅ Frequency counting problems
+
+### Limitations:
+- ❌ Only supports associative and commutative operations
+- ❌ Cannot handle range min/max queries directly
+- ❌ Range updates require additional techniques
+- ❌ Not suitable for complex range operations
+
+### Next Steps:
+- Practice basic implementation from scratch
+- Solve range sum problems
+- Learn coordinate compression techniques
+- Explore 2D Fenwick Trees
+- Study advanced applications in competitive programming
+
+Fenwick Trees are a fundamental tool in the competitive programmer's toolkit and provide an excellent foundation for understanding more advanced data structures
+
+//14/7/25 (day20)//
+
+# Minimum Spanning Tree (MST) - Kruskal's Algorithm
+
+## What is a Minimum Spanning Tree?
+
+A **Minimum Spanning Tree (MST)** is a subset of edges in a connected, undirected, weighted graph that:
+- Connects all vertices together
+- Has no cycles (forms a tree)
+- Has the minimum possible total edge weight
+
+### Key Properties:
+- For a graph with `n` vertices, MST has exactly `n-1` edges
+- MST is unique if all edge weights are distinct
+- Removing any edge from MST disconnects the graph
+- Adding any edge to MST creates a cycle
+
+## Kruskal's Algorithm
+
+Kruskal's algorithm is a **greedy algorithm** that finds the MST by:
+1. Sorting all edges by weight in ascending order
+2. Picking the smallest edge that doesn't form a cycle
+3. Repeating until we have `n-1` edges
+
+### Algorithm Steps:
+1. Sort all edges in non-decreasing order of weight
+2. Initialize each vertex as a separate component (using Union-Find)
+3. For each edge in sorted order:
+   - If the edge connects two different components, add it to MST
+   - Union the two components
+4. Stop when MST has `n-1` edges
+
+### Pseudocode:
+```
+function Kruskal(Graph G):
+    MST = empty set
+    Sort all edges by weight
+    Initialize Union-Find data structure
+    
+    for each edge (u, v) in sorted order:
+        if Find(u) != Find(v):
+            Add edge (u, v) to MST
+            Union(u, v)
+    
+    return MST
+```
+
+## Union-Find Data Structure
+
+Kruskal's algorithm uses **Union-Find** (Disjoint Set Union) to efficiently:
+- Check if two vertices are in the same component
+- Merge two components
+
+### Operations:
+- **Find(x)**: Returns the root/representative of the set containing x
+- **Union(x, y)**: Merges the sets containing x and y
+
+### Implementation with Path Compression and Union by Rank:
+```python
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
+    
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])  # Path compression
+        return self.parent[x]
+    
+    def union(self, x, y):
+        px, py = self.find(x), self.find(y)
+        if px == py:
+            return False
+        
+        # Union by rank
+        if self.rank[px] < self.rank[py]:
+            px, py = py, px
+        self.parent[py] = px
+        if self.rank[px] == self.rank[py]:
+            self.rank[px] += 1
+        return True
+```
+
+## Complete Implementation
+
+```python
+def kruskal_mst(n, edges):
+    """
+    Find MST using Kruskal's algorithm
+    
+    Args:
+        n: number of vertices (0 to n-1)
+        edges: list of (weight, u, v) tuples
+    
+    Returns:
+        List of edges in MST and total weight
+    """
+    # Sort edges by weight
+    edges.sort()
+    
+    # Initialize Union-Find
+    uf = UnionFind(n)
+    
+    mst_edges = []
+    total_weight = 0
+    
+    for weight, u, v in edges:
+        if uf.union(u, v):
+            mst_edges.append((u, v, weight))
+            total_weight += weight
+            
+            # Stop when we have n-1 edges
+            if len(mst_edges) == n - 1:
+                break
+    
+    return mst_edges, total_weight
+
+# Example usage
+if __name__ == "__main__":
+    # Graph with 4 vertices (0, 1, 2, 3)
+    n = 4
+    edges = [
+        (1, 0, 1),  # weight=1, edge 0-1
+        (2, 1, 2),  # weight=2, edge 1-2
+        (3, 2, 3),  # weight=3, edge 2-3
+        (4, 0, 2),  # weight=4, edge 0-2
+        (5, 1, 3),  # weight=5, edge 1-3
+        (6, 0, 3),  # weight=6, edge 0-3
+    ]
+    
+    mst, weight = kruskal_mst(n, edges)
+    print(f"MST edges: {mst}")
+    print(f"Total weight: {weight}")
+```
+
+## Time and Space Complexity
+
+### Time Complexity:
+- **Sorting edges**: O(E log E)
+- **Union-Find operations**: O(E α(V)) where α is inverse Ackermann function
+- **Overall**: O(E log E) where E = number of edges
+
+### Space Complexity:
+- **Union-Find structure**: O(V)
+- **Edge storage**: O(E)
+- **Overall**: O(V + E)
+
+## Example Walkthrough
+
+Consider this graph:
+```
+    0 ---- 1
+    |    / |
+    |   /  |
+    |  /   |
+    | /    |
+    2 ---- 3
+```
+
+Edges with weights:
+- (0,1): weight 1
+- (1,2): weight 2
+- (2,3): weight 3
+- (0,2): weight 4
+- (1,3): weight 5
+- (0,3): weight 6
+
+### Step-by-step execution:
+1. **Sort edges**: [(1,0,1), (2,1,2), (3,2,3), (4,0,2), (5,1,3), (6,0,3)]
+2. **Process (0,1), weight=1**: Different components → Add to MST
+3. **Process (1,2), weight=2**: Different components → Add to MST
+4. **Process (2,3), weight=3**: Different components → Add to MST
+5. **Process (0,2), weight=4**: Same component → Skip
+6. **Done**: MST has 3 edges (n-1 = 4-1 = 3)
+
+**Result**: MST = {(0,1), (1,2), (2,3)}, Total weight = 6
+
+## Applications
+
+1. **Network Design**: Minimum cost to connect all nodes
+2. **Clustering**: Group similar data points
+3. **Image Segmentation**: Connect pixels with similar properties
+4. **Approximation Algorithms**: For traveling salesman problem
+5. **Circuit Design**: Minimize wire length
+
+## Comparison with Prim's Algorithm
+
+| Aspect | Kruskal's | Prim's |
+|--------|-----------|--------|
+| Approach | Edge-based | Vertex-based |
+| Data Structure | Union-Find | Priority Queue |
+| Time Complexity | O(E log E) | O(E log V) |
+| Space Complexity | O(V) | O(V) |
+| Better for | Sparse graphs | Dense graphs |
+
+## Key Points to Remember
+
+1. **Greedy Choice**: Always pick the minimum weight edge that doesn't create a cycle
+2. **Cycle Detection**: Use Union-Find for efficient cycle detection
+3. **Edge Cases**: Handle disconnected graphs (forest of MSTs)
+4. **Optimization**: Path compression and union by rank for better performance
+5. **Alternative**: Prim's algorithm is another MST algorithm with different approach
+
+## Common Interview Questions
+
+1. **Basic**: Implement Kruskal's algorithm
+2. **Variation**: Find MST in a graph with negative weights
+3. **Application**: Connect cities with minimum cost
+4. **Optimization**: Handle large graphs efficiently
+5. **Theory**: Prove correctness of greedy approach
+
+## Practice Problems
+
+1. Find MST of given graph
+2. Minimum cost to connect all points
+3. Critical connections in a network
+4. Optimize water supply network
+5. Design communication network with minimum cost

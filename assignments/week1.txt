@@ -391,3 +391,9 @@ Note: You can make other 3 combinations for the above program.
 4. Write a program to print X shape of N lines.
 5. Write a program to print X shape inside a hollow square of N lines.
 6. Write a program to print Hollow Benzene Ring of N lines.
+
+
+
+what is java?
+pillars of oops
+loops,when will we use it ,how to use it
