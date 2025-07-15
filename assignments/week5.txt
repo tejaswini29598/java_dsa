@@ -1,0 +1,2 @@
+krushkal's algorithm
+prism's algorithm
