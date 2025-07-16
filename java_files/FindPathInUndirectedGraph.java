@@ -132,12 +132,13 @@ public class FindPathInUndirectedGraph {
         for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
 
         for (int i = 0; i < m; i++) {
+            //representing an undirected edge between nodes u and v.
             int u = sc.nextInt();
             int v = sc.nextInt();
             adj.get(u).add(v);
             adj.get(v).add(u);
         }
-
+        //representing the nodes between which you need to determine if a path exists.
         int start = sc.nextInt();
         int end = sc.nextInt();
 

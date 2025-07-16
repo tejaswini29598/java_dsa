@@ -9945,3 +9945,2615 @@ public class MergeSort {
 
 This comprehensive guide covers all sorting algorithms from your Day 5 curriculum with detailed implementations and comparisons!
 
+Day -6
+## Bucket Sort and Radix Sort - Notes
+
+### 1. Bucket Sort
+
+#### What is Bucket Sort?
+Bucket Sort is a sorting algorithm that distributes elements into a number of buckets, sorts each bucket individually, and then concatenates the sorted buckets to get the final sorted array.
+
+#### When to Use Bucket Sort:
+- When input is uniformly distributed over a range
+- When you know the range of input values
+- Best for floating-point numbers in [0, 1) range
+
+#### Algorithm:
+1. Create n empty buckets
+2. Distribute array elements into buckets based on their values
+3. Sort each bucket individually (using any sorting algorithm)
+4. Concatenate all sorted buckets
+
+#### Implementation:
+```java
+import java.util.*;
+
+public class BucketSort {
+    public static void bucketSort(float[] arr) {
+        int n = arr.length;
+        
+        // Create empty buckets
+        List<Float>[] buckets = new ArrayList[n];
+        for (int i = 0; i < n; i++) {
+            buckets[i] = new ArrayList<>();
+        }
+        
+        // Put array elements into buckets
+        for (int i = 0; i < n; i++) {
+            int bucketIndex = (int) (n * arr[i]);
+            buckets[bucketIndex].add(arr[i]);
+        }
+        
+        // Sort individual buckets
+        for (int i = 0; i < n; i++) {
+            Collections.sort(buckets[i]);
+        }
+        
+        // Concatenate all buckets
+        int index = 0;
+        for (int i = 0; i < n; i++) {
+            for (float value : buckets[i]) {
+                arr[index++] = value;
+            }
+        }
+    }
+    
+    // For integer arrays with known range
+    public static void bucketSortIntegers(int[] arr, int maxValue) {
+        int n = arr.length;
+        
+        // Create buckets
+        List<Integer>[] buckets = new ArrayList[n];
+        for (int i = 0; i < n; i++) {
+            buckets[i] = new ArrayList<>();
+        }
+        
+        // Distribute elements into buckets
+        for (int i = 0; i < n; i++) {
+            int bucketIndex = (arr[i] * n) / (maxValue + 1);
+            buckets[bucketIndex].add(arr[i]);
+        }
+        
+        // Sort each bucket
+        for (int i = 0; i < n; i++) {
+            Collections.sort(buckets[i]);
+        }
+        
+        // Merge buckets back
+        int index = 0;
+        for (int i = 0; i < n; i++) {
+            for (int value : buckets[i]) {
+                arr[index++] = value;
+            }
+        }
+    }
+    
+    public static void main(String[] args) {
+        float[] arr = {0.42f, 0.32f, 0.23f, 0.52f, 0.25f, 0.47f, 0.51f};
+        System.out.println("Original array: " + Arrays.toString(arr));
+        
+        bucketSort(arr);
+        System.out.println("Sorted array: " + Arrays.toString(arr));
+    }
+}
+```
+
+#### Time Complexity:
+- **Best Case**: O(n + k) where k is the number of buckets
+- **Average Case**: O(n + k)
+- **Worst Case**: O(n²) when all elements go to one bucket
+
+#### Space Complexity: O(n + k)
+
+#### Characteristics:
+- **Stable**: Yes (depends on sorting algorithm used for buckets)
+- **In-place**: No
+- **Adaptive**: No
+
+#### Advantages:
+- Very efficient when input is uniformly distributed
+- Can achieve O(n) time complexity in best case
+- Stable sorting algorithm
+- Good for sorting floating-point numbers
+
+#### Disadvantages:
+- Requires knowledge of input range
+- Performance depends on input distribution
+- Uses extra space for buckets
+- Not suitable for general-purpose sorting
+
+---
+
+### 2. Radix Sort
+
+#### What is Radix Sort?
+Radix Sort is a non-comparative sorting algorithm that sorts numbers by processing individual digits. It uses counting sort as a subroutine to sort digits.
+
+#### Types of Radix Sort:
+1. **LSD (Least Significant Digit)**: Sorts from rightmost digit to leftmost
+2. **MSD (Most Significant Digit)**: Sorts from leftmost digit to rightmost
+
+#### Algorithm (LSD):
+1. Find the maximum number to determine number of digits
+2. For each digit position (from least to most significant):
+   - Use counting sort to sort array based on current digit
+3. Repeat until all digits are processed
+
+#### Implementation:
+```java
+public class RadixSort {
+    
+    // Main radix sort function
+    public static void radixSort(int[] arr) {
+        // Find maximum number to determine number of digits
+        int max = getMax(arr);
+        
+        // Do counting sort for every digit
+        // exp is 10^i where i is current digit number
+        for (int exp = 1; max / exp > 0; exp *= 10) {
+            countingSort(arr, exp);
+        }
+    }
+    
+    // Find maximum element in array
+    private static int getMax(int[] arr) {
+        int max = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
+    
+    // Counting sort based on digit represented by exp
+    private static void countingSort(int[] arr, int exp) {
+        int n = arr.length;
+        int[] output = new int[n];
+        int[] count = new int[10]; // For digits 0-9
+        
+        // Initialize count array
+        Arrays.fill(count, 0);
+        
+        // Store count of occurrences of each digit
+        for (int i = 0; i < n; i++) {
+            count[(arr[i] / exp) % 10]++;
+        }
+        
+        // Change count[i] so it contains actual position of digit
+        for (int i = 1; i < 10; i++) {
+            count[i] += count[i - 1];
+        }
+        
+        // Build output array
+        for (int i = n - 1; i >= 0; i--) {
+            output[count[(arr[i] / exp) % 10] - 1] = arr[i];
+            count[(arr[i] / exp) % 10]--;
+        }
+        
+        // Copy output array to arr
+        for (int i = 0; i < n; i++) {
+            arr[i] = output[i];
+        }
+    }
+    
+    // Radix sort for strings
+    public static void radixSortStrings(String[] arr) {
+        if (arr.length == 0) return;
+        
+        // Find maximum length
+        int maxLength = 0;
+        for (String str : arr) {
+            maxLength = Math.max(maxLength, str.length());
+        }
+        
+        // Sort from rightmost character to leftmost
+        for (int pos = maxLength - 1; pos >= 0; pos--) {
+            countingSortStrings(arr, pos);
+        }
+    }
+    
+    private static void countingSortStrings(String[] arr, int pos) {
+        int n = arr.length;
+        String[] output = new String[n];
+        int[] count = new int[256]; // For ASCII characters
+        
+        Arrays.fill(count, 0);
+        
+        // Count occurrences of each character
+        for (String str : arr) {
+            int charIndex = (pos < str.length()) ? str.charAt(pos) : 0;
+            count[charIndex]++;
+        }
+        
+        // Change count[i] to actual position
+        for (int i = 1; i < 256; i++) {
+            count[i] += count[i - 1];
+        }
+        
+        // Build output array
+        for (int i = n - 1; i >= 0; i--) {
+            int charIndex = (pos < arr[i].length()) ? arr[i].charAt(pos) : 0;
+            output[count[charIndex] - 1] = arr[i];
+            count[charIndex]--;
+        }
+        
+        // Copy output to original array
+        System.arraycopy(output, 0, arr, 0, n);
+    }
+    
+    public static void main(String[] args) {
+        int[] arr = {170, 45, 75, 90, 2, 802, 24, 66};
+        System.out.println("Original array: " + Arrays.toString(arr));
+        
+        radixSort(arr);
+        System.out.println("Sorted array: " + Arrays.toString(arr));
+        
+        // String example
+        String[] strArr = {"apple", "banana", "cherry", "date", "elderberry"};
+        System.out.println("Original strings: " + Arrays.toString(strArr));
+        
+        radixSortStrings(strArr);
+        System.out.println("Sorted strings: " + Arrays.toString(strArr));
+    }
+}
+```
+
+#### Time Complexity:
+- **Best Case**: O(d × (n + k)) where d = number of digits, k = range of digits
+- **Average Case**: O(d × (n + k))
+- **Worst Case**: O(d × (n + k))
+
+#### Space Complexity: O(n + k)
+
+#### Characteristics:
+- **Stable**: Yes
+- **In-place**: No
+- **Adaptive**: No
+
+#### Advantages:
+- Linear time complexity O(d × n) for fixed number of digits
+- Stable sorting algorithm
+- Good for sorting integers and strings
+- No comparisons needed
+
+#### Disadvantages:
+- Only works for integers, strings, or fixed-length keys
+- Uses extra space
+- Performance depends on number of digits
+- Not suitable for general-purpose sorting
+
+---
+
+## Comparison: Bucket Sort vs Radix Sort
+
+| Aspect | Bucket Sort | Radix Sort |
+|--------|-------------|------------|
+| **Type** | Distribution Sort | Non-comparative Sort |
+| **Best For** | Uniformly distributed data | Integers, strings |
+| **Time Complexity** | O(n + k) average | O(d × (n + k)) |
+| **Space Complexity** | O(n + k) | O(n + k) |
+| **Stability** | Yes | Yes |
+| **Input Requirements** | Known range | Fixed-length keys |
+| **Use Cases** | Float numbers [0,1) | Integers, strings |
+
+## Advanced Variations:
+
+### 1. **Counting Sort (Used in Radix Sort)**
+```java
+public static void countingSort(int[] arr, int range) {
+    int n = arr.length;
+    int[] count = new int[range + 1];
+    int[] output = new int[n];
+    
+    // Count occurrences
+    for (int i = 0; i < n; i++) {
+        count[arr[i]]++;
+    }
+    
+    // Cumulative count
+    for (int i = 1; i <=
+    range; i++) {
+        count[i] += count[i - 1];
+        }
+
+        // Build output array
+        for (int i = n - 1; i >= 0; i--) {
+        output[count[arr[i]] - 1] = arr[i];
+        count[arr[i]]--;
+        }
+
+        // Copy output to original array
+        for (int i = 0; i < n; i++) {
+        arr[i] = output[i];
+        }
+    }
+```
+
+#### Characteristics:
+- **Stable**: Yes
+- **In-place**: No
+- **Time Complexity**: O(n + k)
+- **Space Complexity**: O(n + k)
+
+---
+
+## Summary
+
+- **Bucket Sort** and **Radix Sort** are efficient for specific types of data and can outperform comparison-based sorts in those cases.
+- Both require extra space and have input constraints.
+- **Counting Sort** is a key building block for Radix Sort and is also efficient for small ranges.
+
+---
+Day 7 
+## Stack Data Structure - Notes
+
+### What is a Stack?
+A **Stack** is a linear data structure that follows the **LIFO (Last In, First Out)** principle. Think of it like a stack of plates - you can only add or remove plates from the top.
+
+### Key Characteristics:
+- **LIFO Principle**: The last element added is the first one to be removed
+- **Single Point of Access**: All operations happen at the top of the stack
+- **Dynamic Size**: Can grow and shrink during runtime
+
+### Basic Stack Operations:
+
+#### 1. **Push**
+- Adds an element to the top of the stack
+- Time Complexity: O(1)
+```java
+stack.push(element);
+```
+
+#### 2. **Pop**
+- Removes and returns the top element
+- Time Complexity: O(1)
+- Throws exception if stack is empty
+```java
+element = stack.pop();
+```
+
+#### 3. **Peek/Top**
+- Returns the top element without removing it
+- Time Complexity: O(1)
+```java
+element = stack.peek();
+```
+
+#### 4. **isEmpty**
+- Checks if the stack is empty
+- Time Complexity: O(1)
+```java
+boolean empty = stack.isEmpty();
+```
+
+#### 5. **Size**
+- Returns the number of elements in the stack
+- Time Complexity: O(1)
+```java
+int size = stack.size();
+```
+
+### Stack Implementation in Java:
+
+#### 1. **Using Java Collections Framework**
+```java
+import java.util.Stack;
+
+Stack<Integer> stack = new Stack<>();
+stack.push(10);
+stack.push(20);
+stack.push(30);
+
+System.out.println(stack.pop()); // Output: 30
+System.out.println(stack.peek()); // Output: 20
+```
+
+#### 2. **Using ArrayList**
+```java
+import java.util.ArrayList;
+
+ArrayList<Integer> stack = new ArrayList<>();
+// Push operation
+stack.add(element);
+// Pop operation
+stack.remove(stack.size() - 1);
+// Peek operation
+stack.get(stack.size() - 1);
+```
+
+#### 3. **Array-based Implementation**
+```java
+class ArrayStack {
+    private int[] arr;
+    private int top;
+    private int capacity;
+    
+    public ArrayStack(int size) {
+        arr = new int[size];
+        capacity = size;
+        top = -1;
+    }
+    
+    public void push(int x) {
+        if (top == capacity - 1) {
+            throw new RuntimeException("Stack Overflow");
+        }
+        arr[++top] = x;
+    }
+    
+    public int pop() {
+        if (isEmpty()) {
+            throw new RuntimeException("Stack Underflow");
+        }
+        return arr[top--];
+    }
+    
+    public int peek() {
+        if (isEmpty()) {
+            throw new RuntimeException("Stack is empty");
+        }
+        return arr[top];
+    }
+    
+    public boolean isEmpty() {
+        return top == -1;
+    }
+}
+```
+
+### Real-World Applications:
+
+#### 1. **Function Call Management**
+- Method calls are stored in a call stack
+- When a method is called, it's pushed onto the stack
+- When it returns, it's popped from the stack
+
+#### 2. **Expression Evaluation**
+- **Infix to Postfix conversion**
+- **Postfix expression evaluation**
+- **Parentheses matching**
+
+#### 3. **Undo Operations**
+- Text editors use stacks for undo functionality
+- Each action is pushed onto the stack
+- Undo pops the last action
+
+#### 4. **Browser History**
+- Back button functionality
+- Each visited page is pushed onto the stack
+
+### Common Stack Problems:
+
+#### 1. **Balanced Parentheses**
+```java
+public boolean isBalanced(String str) {
+    Stack<Character> stack = new Stack<>();
+    
+    for (char c : str.toCharArray()) {
+        if (c == '(' || c == '[' || c == '{') {
+            stack.push(c);
+        } else if (c == ')' || c == ']' || c == '}') {
+            if (stack.isEmpty()) return false;
+            
+            char top = stack.pop();
+            if (!isMatchingPair(top, c)) return false;
+        }
+    }
+    
+    return stack.isEmpty();
+}
+```
+
+#### 2. **Postfix Expression Evaluation**
+```java
+public int evaluatePostfix(String expression) {
+    Stack<Integer> stack = new Stack<>();
+    
+    for (char c : expression.toCharArray()) {
+        if (Character.isDigit(c)) {
+            stack.push(c - '0');
+        } else {
+            int operand2 = stack.pop();
+            int operand1 = stack.pop();
+            
+            switch (c) {
+                case '+': stack.push(operand1 + operand2); break;
+                case '-': stack.push(operand1 - operand2); break;
+                case '*': stack.push(operand1 * operand2); break;
+                case '/': stack.push(operand1 / operand2); break;
+            }
+        }
+    }
+    
+    return stack.pop();
+}
+```
+
+### Stack vs Other Data Structures:
+
+| Feature | Stack | Queue | Array | Linked List |
+|---------|-------|-------|-------|-------------|
+| Access Pattern | LIFO | FIFO | Random | Sequential |
+| Insertion | Top only | Rear only | Any position | Any position |
+| Deletion | Top only | Front only | Any position | Any position |
+| Time Complexity | O(1) | O(1) | O(1) for access | O(n) for access |
+
+### Advantages:
+- **Simple Implementation**: Easy to understand and implement
+- **Efficient Operations**: All basic operations are O(1)
+- **Memory Efficient**: No extra memory overhead
+- **Automatic Memory Management**: In dynamic implementations
+
+### Disadvantages:
+- **Limited Access**: Can only access the top element
+- **No Random Access**: Cannot access elements in the middle
+- **Stack Overflow**: Fixed-size implementations can overflow
+
+### Time & Space Complexity:
+- **Push**: O(1)
+- **Pop**: O(1)
+- **Peek**: O(1)
+- **isEmpty**: O(1)
+- **Space Complexity**: O(n) where n is the number of elements
+
+### Key Points to Remember:
+1. Stack is a **LIFO** data structure
+2. All operations happen at the **top** of the stack
+3. **Push** adds elements, **Pop** removes elements
+4. Always check for **empty stack** before popping
+5. Useful for **recursive problems** and **expression evaluation**
+6. Java provides built-in `Stack` class in `java.util` package
+
+## Queue Data Structure - Notes
+
+### What is a Queue?
+A **Queue** is a linear data structure that follows the **FIFO (First In, First Out)** principle. Think of it like a line of people waiting - the first person to join the line is the first one to be served.
+
+### Key Characteristics:
+- **FIFO Principle**: The first element added is the first one to be removed
+- **Two Points of Access**: Insertion at rear, deletion from front
+- **Dynamic Size**: Can grow and shrink during runtime
+
+### Basic Queue Operations:
+
+#### 1. **Enqueue**
+- Adds an element to the rear of the queue
+- Time Complexity: O(1)
+```java
+queue.offer(element);
+// or
+queue.add(element);
+```
+
+#### 2. **Dequeue**
+- Removes and returns the front element
+- Time Complexity: O(1)
+- Returns null if queue is empty (poll) or throws exception (remove)
+```java
+element = queue.poll(); // Returns null if empty
+element = queue.remove(); // Throws exception if empty
+```
+
+#### 3. **Front/Peek**
+- Returns the front element without removing it
+- Time Complexity: O(1)
+```java
+element = queue.peek(); // Returns null if empty
+element = queue.element(); // Throws exception if empty
+```
+
+#### 4. **isEmpty**
+- Checks if the queue is empty
+- Time Complexity: O(1)
+```java
+boolean empty = queue.isEmpty();
+```
+
+#### 5. **Size**
+- Returns the number of elements in the queue
+- Time Complexity: O(1)
+```java
+int size = queue.size();
+```
+
+### Queue Implementation in Java:
+
+#### 1. **Using Java Collections Framework**
+```java
+import java.util.Queue;
+import java.util.LinkedList;
+
+Queue<Integer> queue = new LinkedList<>();
+queue.offer(10);
+queue.offer(20);
+queue.offer(30);
+
+System.out.println(queue.poll()); // Output: 10
+System.out.println(queue.peek()); // Output: 20
+```
+
+#### 2. **Using ArrayDeque**
+```java
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+Queue<Integer> queue = new ArrayDeque<>();
+queue.offer(10);
+queue.offer(20);
+queue.offer(30);
+```
+
+#### 3. **Array-based Implementation (Circular Queue)**
+```java
+class ArrayQueue {
+    private int[] arr;
+    private int front;
+    private int rear;
+    private int size;
+    private int capacity;
+    
+    public ArrayQueue(int capacity) {
+        this.capacity = capacity;
+        arr = new int[capacity];
+        front = 0;
+        rear = -1;
+        size = 0;
+    }
+    
+    public void enqueue(int x) {
+        if (size == capacity) {
+            throw new RuntimeException("Queue Overflow");
+        }
+        rear = (rear + 1) % capacity;
+        arr[rear] = x;
+        size++;
+    }
+    
+    public int dequeue() {
+        if (isEmpty()) {
+            throw new RuntimeException("Queue Underflow");
+        }
+        int element = arr[front];
+        front = (front + 1) % capacity;
+        size--;
+        return element;
+    }
+    
+    public int peek() {
+        if (isEmpty()) {
+            throw new RuntimeException("Queue is empty");
+        }
+        return arr[front];
+    }
+    
+    public boolean isEmpty() {
+        return size == 0;
+    }
+    
+    public int size() {
+        return size;
+    }
+}
+```
+
+#### 4. **Linked List Implementation**
+```java
+class Node {
+    int data;
+    Node next;
+    
+    Node(int data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+class LinkedQueue {
+    private Node front;
+    private Node rear;
+    private int size;
+    
+    public LinkedQueue() {
+        front = null;
+        rear = null;
+        size = 0;
+    }
+    
+    public void enqueue(int x) {
+        Node newNode = new Node(x);
+        if (rear == null) {
+            front = rear = newNode;
+        } else {
+            rear.next = newNode;
+            rear = newNode;
+        }
+        size++;
+    }
+    
+    public int dequeue() {
+        if (isEmpty()) {
+            throw new RuntimeException("Queue Underflow");
+        }
+        int element = front.data;
+        front = front.next;
+        if (front == null) {
+            rear = null;
+        }
+        size--;
+        return element;
+    }
+    
+    public int peek() {
+        if (isEmpty()) {
+            throw new RuntimeException("Queue is empty");
+        }
+        return front.data;
+    }
+    
+    public boolean isEmpty() {
+        return front == null;
+    }
+    
+    public int size() {
+        return size;
+    }
+}
+```
+
+### Types of Queues:
+
+#### 1. **Simple Queue**
+- Basic FIFO queue
+- Insertion at rear, deletion from front
+
+#### 2. **Circular Queue**
+- Uses circular array to optimize space
+- Rear wraps around to beginning when it reaches end
+
+#### 3. **Priority Queue**
+- Elements have priorities
+- Higher priority elements are dequeued first
+```java
+import java.util.PriorityQueue;
+
+PriorityQueue<Integer> pq = new PriorityQueue<>();
+pq.offer(30);
+pq.offer(10);
+pq.offer(20);
+System.out.println(pq.poll()); // Output: 10 (lowest priority first)
+```
+
+#### 4. **Double-Ended Queue (Deque)**
+- Insertion and deletion at both ends
+```java
+import java.util.Deque;
+import java.util.ArrayDeque;
+
+Deque<Integer> deque = new ArrayDeque<>();
+deque.offerFirst(10);  // Add to front
+deque.offerLast(20);   // Add to rear
+deque.pollFirst();     // Remove from front
+deque.pollLast();      // Remove from rear
+```
+
+### Real-World Applications:
+
+#### 1. **CPU Scheduling**
+- Process scheduling in operating systems
+- Round-robin scheduling algorithm
+
+#### 2. **Print Queue**
+- Managing print jobs in printers
+- First submitted job gets printed first
+
+#### 3. **BFS (Breadth-First Search)**
+- Graph traversal algorithm
+- Level-order traversal in trees
+
+#### 4. **Buffer for Data Streams**
+- Keyboard buffer
+- Network packet buffering
+
+#### 5. **Call Center Systems**
+- Managing incoming calls
+- First caller gets served first
+
+### Common Queue Problems:
+
+#### 1. **Implement Stack using Queues**
+```java
+class MyStack {
+    private Queue<Integer> q1;
+    private Queue<Integer> q2;
+    
+    public MyStack() {
+        q1 = new LinkedList<>();
+        q2 = new LinkedList<>();
+    }
+    
+    public void push(int x) {
+        q2.offer(x);
+        while (!q1.isEmpty()) {
+            q2.offer(q1.poll());
+        }
+        Queue<Integer> temp = q1;
+        q1 = q2;
+        q2 = temp;
+    }
+    
+    public int pop() {
+        return q1.poll();
+    }
+    
+    public int top() {
+        return q1.peek();
+    }
+    
+    public boolean empty() {
+        return q1.isEmpty();
+    }
+}
+```
+
+#### 2. **Generate Binary Numbers**
+```java
+public void generateBinary(int n) {
+    Queue<String> queue = new LinkedList<>();
+    queue.offer("1");
+    
+    for (int i = 0; i < n; i++) {
+        String current = queue.poll();
+        System.out.println(current);
+        
+        queue.offer(current + "0");
+        queue.offer(current + "1");
+    }
+}
+```
+
+#### 3. **Level Order Traversal**
+```java
+public void levelOrder(TreeNode root) {
+    if (root == null) return;
+    
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);
+    
+    while (!queue.isEmpty()) {
+        TreeNode current = queue.poll();
+        System.out.print(current.val + " ");
+        
+        if (current.left != null) queue.offer(current.left);
+        if (current.right != null) queue.offer(current.right);
+    }
+}
+```
+
+### Queue vs Other Data Structures:
+
+| Feature | Queue | Stack | Array | Linked List |
+|---------|-------|-------|-------|-------------|
+| Access Pattern | FIFO | LIFO | Random | Sequential |
+| Insertion | Rear only | Top only | Any position | Any position |
+| Deletion | Front only | Top only | Any position | Any position |
+| Time Complexity | O(1) | O(1) | O(1) for access | O(n) for access |
+
+### Advantages:
+- **Fair Processing**: First come, first served
+- **Efficient Operations**: All basic operations are O(1)
+- **Natural Flow**: Matches real-world scenarios
+- **Memory Efficient**: Linked list implementation grows dynamically
+
+### Disadvantages:
+- **Limited Access**: Can only access front element
+- **No Random Access**: Cannot access middle elements
+- **Memory Overhead**: Linked list implementation has pointer overhead
+
+### Time & Space Complexity:
+- **Enqueue**: O(1)
+- **Dequeue**: O(1)
+- **Peek**: O(1)
+- **isEmpty**: O(1)
+- **Space Complexity**: O(n) where n is the number of elements
+
+### Array vs Linked List Implementation:
+
+| Aspect | Array Implementation | Linked List Implementation |
+|--------|---------------------|---------------------------|
+| Memory | Fixed size | Dynamic size |
+| Space | O(n) | O(n) + pointer overhead |
+| Cache Performance | Better | Worse |
+| Implementation | More complex (circular) | Simpler |
+
+### Key Points to Remember:
+1. Queue is a **FIFO** data structure
+2. **Enqueue** adds to rear, **Dequeue** removes from front
+3. Use **LinkedList** or **ArrayDeque** in Java
+4. **Circular queue** prevents memory wastage in array implementation
+5. Essential for **BFS** and **level-order traversal**
+6. Java provides **Queue** interface with multiple implementations
+7. **PriorityQueue** is useful for scheduling algorithms
+8. **Deque** provides flexibility for both ends operations
+
+Day -8 
+## Linked List Data Structure - Notes
+
+### What is a Linked List?
+A **Linked List** is a linear data structure where elements are stored in nodes, and each node contains data and a reference (or link) to the next node in the sequence. Unlike arrays, linked list elements are not stored in contiguous memory locations.
+
+### Key Characteristics:
+- **Dynamic Size**: Can grow or shrink during runtime
+- **Non-contiguous Memory**: Elements stored anywhere in memory
+- **Sequential Access**: Must traverse from head to reach any element
+- **No Random Access**: Cannot directly access elements by index
+
+---
+
+## 1. Singly Linked List
+
+### Structure:
+Each node contains:
+- **Data**: The actual value
+- **Next**: Reference to the next node
+
+### Implementation:
+```java
+class Node {
+    int data;
+    Node next;
+    
+    Node(int data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+class SinglyLinkedList {
+    private Node head;
+    
+    public SinglyLinkedList() {
+        this.head = null;
+    }
+    
+    // Insert at beginning
+    public void insertAtBeginning(int data) {
+        Node newNode = new Node(data);
+        newNode.next = head;
+        head = newNode;
+    }
+    
+    // Insert at end
+    public void insertAtEnd(int data) {
+        Node newNode = new Node(data);
+        
+        if (head == null) {
+            head = newNode;
+            return;
+        }
+        
+        Node current = head;
+        while (current.next != null) {
+            current = current.next;
+        }
+        current.next = newNode;
+    }
+    
+    // Insert at specific position
+    public void insertAtPosition(int data, int position) {
+        if (position == 0) {
+            insertAtBeginning(data);
+            return;
+        }
+        
+        Node newNode = new Node(data);
+        Node current = head;
+        
+        for (int i = 0; i < position - 1 && current != null; i++) {
+            current = current.next;
+        }
+        
+        if (current == null) {
+            throw new IndexOutOfBoundsException("Position out of bounds");
+        }
+        
+        newNode.next = current.next;
+        current.next = newNode;
+    }
+    
+    // Delete from beginning
+    public void deleteFromBeginning() {
+        if (head == null) return;
+        head = head.next;
+    }
+    
+    // Delete from end
+    public void deleteFromEnd() {
+        if (head == null) return;
+        
+        if (head.next == null) {
+            head = null;
+            return;
+        }
+        
+        Node current = head;
+        while (current.next.next != null) {
+            current = current.next;
+        }
+        current.next = null;
+    }
+    
+    // Delete specific value
+    public void deleteValue(int value) {
+        if (head == null) return;
+        
+        if (head.data == value) {
+            head = head.next;
+            return;
+        }
+        
+        Node current = head;
+        while (current.next != null && current.next.data != value) {
+            current = current.next;
+        }
+        
+        if (current.next != null) {
+            current.next = current.next.next;
+        }
+    }
+    
+    // Search for value
+    public boolean search(int value) {
+        Node current = head;
+        while (current != null) {
+            if (current.data == value) {
+                return true;
+            }
+            current = current.next;
+        }
+        return false;
+    }
+    
+    // Get size
+    public int size() {
+        int count = 0;
+        Node current = head;
+        while (current != null) {
+            count++;
+            current = current.next;
+        }
+        return count;
+    }
+    
+    // Forward traversal
+    public void display() {
+        Node current = head;
+        while (current != null) {
+            System.out.print(current.data + " -> ");
+            current = current.next;
+        }
+        System.out.println("null");
+    }
+    
+    // Reverse the linked list
+    public void reverse() {
+        Node prev = null;
+        Node current = head;
+        Node next = null;
+        
+        while (current != null) {
+            next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+        
+        head = prev;
+    }
+}
+```
+
+### Time Complexity:
+- **Insertion**: O(1) at beginning, O(n) at end/position
+- **Deletion**: O(1) at beginning, O(n) at end/specific value
+- **Search**: O(n)
+- **Traversal**: O(n)
+
+---
+
+## 2. Doubly Linked List
+
+### Structure:
+Each node contains:
+- **Data**: The actual value
+- **Next**: Reference to the next node
+- **Prev**: Reference to the previous node
+
+### Implementation:
+```java
+class DoublyNode {
+    int data;
+    DoublyNode next;
+    DoublyNode prev;
+    
+    DoublyNode(int data) {
+        this.data = data;
+        this.next = null;
+        this.prev = null;
+    }
+}
+
+class DoublyLinkedList {
+    private DoublyNode head;
+    private DoublyNode tail;
+    
+    public DoublyLinkedList() {
+        this.head = null;
+        this.tail = null;
+    }
+    
+    // Insert at beginning
+    public void insertAtBeginning(int data) {
+        DoublyNode newNode = new DoublyNode(data);
+        
+        if (head == null) {
+            head = tail = newNode;
+        } else {
+            newNode.next = head;
+            head.prev = newNode;
+            head = newNode;
+        }
+    }
+    
+    // Insert at end
+    public void insertAtEnd(int data) {
+        DoublyNode newNode = new DoublyNode(data);
+        
+        if (tail == null) {
+            head = tail = newNode;
+        } else {
+            tail.next = newNode;
+            newNode.prev = tail;
+            tail = newNode;
+        }
+    }
+    
+    // Insert at position
+    public void insertAtPosition(int data, int position) {
+        if (position == 0) {
+            insertAtBeginning(data);
+            return;
+        }
+        
+        DoublyNode newNode = new DoublyNode(data);
+        DoublyNode current = head;
+        
+        for (int i = 0; i < position && current != null; i++) {
+            current = current.next;
+        }
+        
+        if (current == null) {
+            insertAtEnd(data);
+            return;
+        }
+        
+        newNode.next = current;
+        newNode.prev = current.prev;
+        current.prev.next = newNode;
+        current.prev = newNode;
+    }
+    
+    // Delete from beginning
+    public void deleteFromBeginning() {
+        if (head == null) return;
+        
+        if (head == tail) {
+            head = tail = null;
+        } else {
+            head = head.next;
+            head.prev = null;
+        }
+    }
+    
+    // Delete from end
+    public void deleteFromEnd() {
+        if (tail == null) return;
+        
+        if (head == tail) {
+            head = tail = null;
+        } else {
+            tail = tail.prev;
+            tail.next = null;
+        }
+    }
+    
+    // Delete specific value
+    public void deleteValue(int value) {
+        DoublyNode current = head;
+        
+        while (current != null && current.data != value) {
+            current = current.next;
+        }
+        
+        if (current == null) return;
+        
+        if (current == head) {
+            deleteFromBeginning();
+        } else if (current == tail) {
+            deleteFromEnd();
+        } else {
+            current.prev.next = current.next;
+            current.next.prev = current.prev;
+        }
+    }
+    
+    // Forward traversal
+    public void displayForward() {
+        DoublyNode current = head;
+        while (current != null) {
+            System.out.print(current.data + " <-> ");
+            current = current.next;
+        }
+        System.out.println("null");
+    }
+    
+    // Backward traversal
+    public void displayBackward() {
+        DoublyNode current = tail;
+        while (current != null) {
+            System.out.print(current.data + " <-> ");
+            current = current.prev;
+        }
+        System.out.println("null");
+    }
+}
+```
+
+### Time Complexity:
+- **Insertion**: O(1) at beginning/end, O(n) at position
+- **Deletion**: O(1) at beginning/end, O(n) for specific value
+- **Search**: O(n)
+- **Traversal**: O(n)
+
+---
+
+## 3. Circular Singly Linked List
+
+### Structure:
+- Last node points to the first node
+- No null pointers except when list is empty
+
+### Implementation:
+```java
+class CircularSinglyLinkedList {
+    private Node head;
+    
+    public CircularSinglyLinkedList() {
+        this.head = null;
+    }
+    
+    // Insert at beginning
+    public void insertAtBeginning(int data) {
+        Node newNode = new Node(data);
+        
+        if (head == null) {
+            head = newNode;
+            newNode.next = head;
+        } else {
+            Node last = head;
+            while (last.next != head) {
+                last = last.next;
+            }
+            newNode.next = head;
+            last.next = newNode;
+            head = newNode;
+        }
+    }
+    
+    // Insert at end
+    public void insertAtEnd(int data) {
+        Node newNode = new Node(data);
+        
+        if (head == null) {
+            head = newNode;
+            newNode.next = head;
+        } else {
+            Node last = head;
+            while (last.next != head) {
+                last = last.next;
+            }
+            last.next = newNode;
+            newNode.next = head;
+        }
+    }
+    
+    // Delete from beginning
+    public void deleteFromBeginning() {
+        if (head == null) return;
+        
+        if (head.next == head) {
+            head = null;
+        } else {
+            Node last = head;
+            while (last.next != head) {
+                last = last.next;
+            }
+            last.next = head.next;
+            head = head.next;
+        }
+    }
+    
+    // Delete from end
+    public void deleteFromEnd() {
+        if (head == null) return;
+        
+        if (head.next == head) {
+            head = null;
+        } else {
+            Node current = head;
+            while (current.next.next != head) {
+                current = current.next;
+            }
+            current.next = head;
+        }
+    }
+    
+    // Display circular list
+    public void display() {
+        if (head == null) return;
+        
+        Node current = head;
+        do {
+            System.out.print(current.data + " -> ");
+            current = current.next;
+        } while (current != head);
+        System.out.println("(back to " + head.data + ")");
+    }
+    
+    // Check if list is empty
+    public boolean isEmpty() {
+        return head == null;
+    }
+}
+```
+
+---
+
+## 4. Circular Doubly Linked List
+
+### Structure:
+- Last node's next points to first node
+- First node's prev points to last node
+
+### Implementation:
+```java
+class CircularDoublyLinkedList {
+    private DoublyNode head;
+    
+    public CircularDoublyLinkedList() {
+        this.head = null;
+    }
+    
+    // Insert at beginning
+    public void insertAtBeginning(int data) {
+        DoublyNode newNode = new DoublyNode(data);
+        
+        if (head == null) {
+            head = newNode;
+            newNode.next = newNode.prev = newNode;
+        } else {
+            DoublyNode last = head.prev;
+            
+            newNode.next = head;
+            newNode.prev = last;
+            last.next = newNode;
+            head.prev = newNode;
+            head = newNode;
+        }
+    }
+    
+    // Insert at end
+    public void insertAtEnd(int data) {
+        DoublyNode newNode = new DoublyNode(data);
+        
+        if (head == null) {
+            head = newNode;
+            newNode.next = newNode.prev = newNode;
+        } else {
+            DoublyNode last = head.prev;
+            
+            newNode.next = head;
+            newNode.prev = last;
+            last.next = newNode;
+            head.prev = newNode;
+        }
+    }
+    
+    // Delete from beginning
+    public void deleteFromBeginning() {
+        if (head == null) return;
+        
+        if (head.next == head) {
+            head = null;
+        } else {
+            DoublyNode last = head.prev;
+            
+            last.next = head.next;
+            head.next.prev = last;
+            head = head.next;
+        }
+    }
+    
+    // Delete from end
+    public void deleteFromEnd() {
+        if (head == null) return;
+        
+        if (head.next == head) {
+            head = null;
+        } else {
+            DoublyNode last = head.prev;
+            
+            last.prev.next = head;
+            head.prev = last.prev;
+        }
+    }
+    
+    // Display forward
+    public void displayForward() {
+        if (head == null) return;
+        
+        DoublyNode current = head;
+        do {
+            System.out.print(current.data + " <-> ");
+            current = current.next;
+        } while (current != head);
+        System.out.println("(back to " + head.data + ")");
+    }
+    
+    // Display backward
+    public void displayBackward() {
+        if (head == null) return;
+        
+        DoublyNode current = head.prev;
+        do {
+            System.out.print(current.data + " <-> ");
+            current = current.prev;
+        } while (current != head.prev);
+        System.out.println("(back to " + head.prev.data + ")");
+    }
+}
+```
+
+---
+
+## Comparison of Linked List Types
+
+| Feature | Singly | Doubly | Circular Singly | Circular Doubly |
+|---------|--------|--------|-----------------|-----------------|
+| **Memory per Node** | 1 pointer | 2 pointers | 1 pointer | 2 pointers |
+| **Traversal Direction** | Forward only | Both directions | Forward only | Both directions |
+| **Last Node Points To** | null | null | First node | First node |
+| **First Node Points To** | N/A | null | N/A | Last node |
+| **Access to Last Node** | O(n) | O(1) | O(n) | O(1) |
+| **Memory Usage** | Lowest | Highest | Low | High |
+
+## Common Operations Complexity
+
+| Operation | Singly | Doubly | Circular Singly | Circular Doubly |
+|-----------|--------|--------|-----------------|-----------------|
+| **Insert at Beginning** | O(1) | O(1) | O(n) | O(1) |
+| **Insert at End** | O(n) | O(1) | O(n) | O(1) |
+| **Delete from Beginning** | O(1) | O(1) | O(n) | O(1) |
+| **Delete from End** | O(n) | O(1) | O(n) | O(1) |
+| **Search** | O(n) | O(n) | O(n) | O(n) |
+| **Traversal** | O(n) | O(n) | O(n) | O(n) |
+
+## Advanced Operations
+
+### 1. **Merge Two Sorted Lists**
+```java
+public Node mergeSortedLists(Node l1, Node l2) {
+    Node dummy = new Node(0);
+    Node current = dummy;
+    
+    while (l1 != null && l2 != null) {
+        if (l1.data <= l2.data) {
+            current.next = l1;
+            l1 = l1.next;
+        } else {
+            current.next = l2;
+            l2 = l2.next;
+        }
+        current = current.next;
+    }
+    
+    current.next = (l1 != null) ? l1 : l2;
+    return dummy.next;
+}
+```
+
+### 2. **Detect Cycle in Linked List (Floyd's Algorithm)**
+```java
+public boolean hasCycle(Node head) {
+    if (head == null || head.next == null) return false;
+    
+    Node
+
+Day -9
+Binary Tree
+    Definition of Binary Tree:
+        - A Binary Tree is 
+          a hierarchical data structure 
+          in which each node has at most two children, 
+          referred to as the left child and the right child.
+
+    Binary Tree Terminologies:
+        | Term                     | Description                                                                                           |
+        | ------------------------ | ----------------------------------------------------------------------------------------------------- |
+        | Node                     | Basic unit containing a data element and links to left and right child nodes.                         |
+        | Root                     | The topmost node in the tree. It has no parent.                                                       |
+        | Parent                   | A node that has a link to one or more child nodes.                                                    |
+        | Child                    | A node that descends from another node (its parent).                                                  |
+        | Left Child               | The node connected via the left link of its parent.                                                   |
+        | Right Child              | The node connected via the right link of its parent.                                                  |
+        | Leaf Node                | A node with no children (i.e., both left and right links are null).                                   |
+        | Subtree                  | A tree formed by any node and its descendants.                                                        |
+        | Siblings                 | Nodes that have the same parent.                                                                      |
+        | Level                    | Distance from the root node (root is level 0 or 1, depending on convention).                          |
+        | Height                   | The length of the longest path from a node to a leaf.                                                 |
+        | Depth                    | The number of edges from the root to the node.                                                        |
+        | Degree                   | Number of children a node has (0, 1, or 2 in binary tree).                                            |
+        | Binary Search Tree (BST) | A binary tree where left child < parent < right child (for all nodes).                                |
+        | Complete Binary Tree     | All levels are completely filled except possibly the last, and all nodes are as far left as possible. |
+        | Full Binary Tree         | Every node has 0 or 2 children.                                                                       |
+        | Perfect Binary Tree      | All internal nodes have two children, and all leaves are at the same level.                           |
+
+    Example
+
+        1. Simple Binary Tree
+            ```
+                 A
+                / \
+               B   C
+              /     \
+             D       E
+            ```
+            * Root: A
+            * Internal Nodes: A, B, C
+            * Leaf Nodes: D, E
+            * Not a full or complete binary tree.
+
+        2. Complete Binary Tree
+            ```
+                 1
+                / \
+               2   3
+              / \  /
+             4  5 6
+            ```
+
+            * All levels are filled except the last, 
+              and nodes are as left as possible.
+            * Good for array representation (e.g., heaps).
+
+        3. Perfect Binary Tree
+            ```
+                  1
+                /   \
+               2     3
+              / \   / \
+             4   5 6   7
+            ```
+
+            * Every internal node has two children.
+            * All leaf nodes are at the same level.
+            * Height = 2, Number of nodes = 2^(h+1) - 1 = 7
+
+        - Each of these binary trees serves 
+          different structural and algorithmic purposes.
+
+    Common Operations on a Binary Tree
+        Binary trees support several fundamental operations 
+        that are essential in various algorithms and data structures. 
+        Here's a breakdown:
+        | Operation               | Time Complexity     | Purpose                                                                              |
+        | ----------------------- | ------------------- | ------------------------------------------------------------------------------------ |
+        | Traversal               | O(n)                | Visit all nodes in a specific order (Inorder, Preorder, Postorder, Level-order).     |
+        | Insertion               | O(n)                | Add a node at the next available position (in level-order-style).                    |
+        | Deletion                | O(n)                | Remove a node while preserving tree structure.                                       |
+        | Search                  | O(n)                | Find a node with a specific value.                                                   |
+        | Find Height             | O(n)                | Compute the longest path from root to leaf.                                          |
+        | Count Nodes / Leaves    | O(n)                | Count total nodes, or count only leaf nodes (with no children).                      |
+        | Mirror / Invert Tree    | O(n)                | Swap left and right children recursively.                                            |
+        | Check for Balanced Tree | O(n)                | Check whether height difference between left and right subtree is ≤ 1 for all nodes. |
+        | Clone / Copy Tree       | O(n)                | Create an exact copy of the tree.                                                    |
+
+        ---
+
+        > Note: `n` = number of nodes in the tree.
+        > Time complexity is linear for most operations because each node may need to be visited once.
+
+Binary Search Tree (BST)
+    Definition of Binary Search Tree (BST):
+        A Binary Search Tree (BST) is 
+        a special type of binary tree where:
+            * The left subtree of a node contains 
+              only nodes with values less than the node’s value.
+            * The right subtree of a node contains only nodes 
+              with values greater than the node’s value.
+            * Both left and right subtrees must also be Binary Search Trees.
+
+        This property makes BSTs efficient for searching, inserting, and deleting data.
+
+    Terminologies in Binary Search Tree (BST):
+        | Term              | Description                                                                   |
+        | ----------------- | ----------------------------------------------------------------------------- |
+        | Node              | Basic element holding data and links to left and right children.              |
+        | Root              | The topmost node in the BST.                                                  |
+        | Parent            | A node that has one or more child nodes.                                      |
+        | Child             | A node descending from a parent.                                              |
+        | Left Child        | The node connected to the left link; holds a smaller value than its parent.   |
+        | Right Child       | The node connected to the right link; holds a greater value than its parent.  |
+        | Leaf Node         | A node with no children.                                                      |
+        | Subtree           | A tree formed from a node and its descendants.                                |
+        | Inorder Traversal | Left → Root → Right traversal; returns nodes in sorted (ascending) order.     |
+        | Height            | The length of the longest path from a node to a leaf.                         |
+        | Depth             | The number of edges from the root to the node.                                |
+        | Balanced BST      | A BST where the height difference between left and right subtrees is minimal. |
+        | Unbalanced BST    | A BST skewed to one side (left or right), degrading performance to O(n).      |
+        | Successor         | The smallest node in the right subtree (used in deletion).                    |
+        | Predecessor       | The largest node in the left subtree.                                         |
+
+    Example of a Binary Search Tree:
+            ```
+                50
+                /  \
+              30    70
+             / \    / \
+           20  40  60  80
+            ```
+        * Node `30` is left of `50`, and all of its descendants (`20`, `40`) are < `50`.
+        * Node `70` is right of `50`, and its descendants (`60`, `80`) are > `50`.
+
+    Example 
+        Example 1: Simple BST
+        ```
+              40
+             /  \
+           20    60
+          / \    / \
+        10  30  50  70
+        ```
+        * Left subtree: All values < 40
+        * Right subtree: All values > 40
+        * Inorder Traversal: `10 20 30 40 50 60 70` (sorted order)
+
+        Example 2: BST Built from [50, 30, 70, 20, 40, 60, 80]
+        ```
+             50
+            /  \
+         30    70
+        / \    / \
+      20  40  60  80
+        ```
+        * Inserted in the order: 
+          root = 50, then 30 (left), 70 (right), and so on 
+          maintaining BST property.
+
+        Example 3: Skewed BST (Right-Skewed)
+        ```
+            10
+             \
+              20
+                \
+                30
+                  \
+                  40
+        ```
+        * Happens when elements are inserted in increasing order.
+        * Worst-case BST (like a linked list), time complexities degrade to O(n).
+
+        Example 4: Skewed BST (Left-Skewed)
+        ```
+                40
+               /
+              30
+             /
+            20
+           /
+          10
+        ```
+
+        * Happens with decreasing order inserts.
+
+    Common Operations on BST:
+        | Operation     | Time Complexity (Average Case)     | Purpose                               |
+        | ------------- | ---------------------------------- | ------------------------------------- |
+        | Search        | O(log n)                           | Find if a value exists                |
+        | Insertion     | O(log n)                           | Add a new node                        |
+        | Deletion      | O(log n)                           | Remove a node and rearrange           |
+        | Traversals    | O(n)                               | Inorder (sorted), Preorder, Postorder |
+
+        > Note: If the BST becomes unbalanced 
+          (e.g., like a linked list), 
+          time complexity can degrade to O(n).
+
+
+    Common Operations on a Binary Search Tree (BST)
+        A Binary Search Tree allows 
+        for efficient searching, insertion, and deletion 
+        by maintaining the BST property:
+        Left subtree < Node < Right subtree.
+
+        | Operation          | Average Time Complexity     | Worst Case     | Purpose                                             |
+        | ------------------ | --------------------------- | -------------- | --------------------------------------------------- |
+        | Search             | O(log n)                    | O(n)           | Find whether a value exists in the tree.            |
+        | Insertion          | O(log n)                    | O(n)           | Add a new node while maintaining BST property.      |
+        | Deletion           | O(log n)                    | O(n)           | Remove a node and rearrange the tree.               |
+        | Inorder Traversal  | O(n)                        | O(n)           | Visit nodes in sorted (ascending) order.            |
+        | Preorder/Postorder | O(n)                        | O(n)           | Used for copying or deleting the tree.              |
+        | Find Min/Max       | O(log n)                    | O(n)           | Go left-most (min) or right-most (max) in the tree. |
+        | Find Successor     | O(log n)                    | O(n)           | Find the next higher value (used in deletion).      |
+        | Height of Tree     | O(n)                        | O(n)           | Longest path from root to leaf.                     |
+        | Is Balanced        | O(n)                        | O(n)           | Check if the tree is height-balanced.               |
+
+        > ⚠ Worst-case happens when the BST becomes skewed (like a linked list), 
+             especially with sorted input.
+
+General Tree
+    Definition of General Tree:
+        - A General Tree is 
+        a hierarchical data structure 
+        where each node can have any number of child nodes. 
+        - Unlike binary trees, 
+        which limit children to at most two, 
+        general trees are more flexible and 
+        are used to represent hierarchies 
+        like file systems, company structures, etc.
+
+    Terminologies in a General Tree:
+        | Term           | Description                                                                     |
+        | -------------- | ------------------------------------------------------------------------------- |
+        | Node           | Basic element containing data and links to child nodes.                         |
+        | Root           | The topmost node in the tree, without a parent.                                 |
+        | Parent         | A node that has one or more child nodes.                                        |
+        | Child          | A node that descends from another node (its parent).                            |
+        | Siblings       | Nodes that share the same parent.                                               |
+        | Leaf Node      | A node with no children.                                                        |
+        | Internal Node  | A node that has at least one child.                                             |
+        | Subtree        | A tree formed by any node and its descendants.                                  |
+        | Level          | The number of edges from the root to the node (root is at level 0 or 1).        |
+        | Height         | The maximum level (or depth) of any node in the tree.                           |
+        | Depth          | The number of edges from the root to the current node.                          |
+        | Degree of Node | Number of children a node has.                                                  |
+        | Degree of Tree | The maximum degree of all nodes in the tree.                                    |
+        | Ancestor       | Any node in the path from the root to a given node (excluding the node itself). |
+        | Descendant     | Any node that comes after a given node in the tree structure.                   |
+
+        - General trees are more abstract and useful 
+        when node relationships are not limited to pairs.
+
+    Example 
+        1. Company Hierarchy Tree
+
+        ```
+                      CEO
+                    /  |   \
+                CTO   CFO   COO
+                / \         |
+             Dev1 Dev2     OpsHead
+        ```
+        * Root: CEO
+        * Internal Nodes: CEO, CTO, COO
+        * Leaf Nodes: Dev1, Dev2, CFO, OpsHead
+        * This shows how an organization may structure its reporting hierarchy.
+
+        2. File System Tree
+
+        ```
+                Root
+              /   |   \
+            etc   usr   var
+                  |
+                 bin
+        ```
+        * Root: Root
+        * Subtrees: etc, usr (with child bin), var
+        * Useful to represent directories and subdirectories.
+
+        3. Family Tree
+
+        ```
+                 Grandparent
+                /     |     \
+             Uncle  Parent Aunt
+                      |
+                    Child
+        ```
+
+        * Shows multi-level relationships.
+        * Degree of `Grandparent` is 3, Height of tree is 3.
+
+
+        Each of these trees highlights 
+        a common use case for general trees, 
+        where nodes may have more than two children.
+
+    Common Operations on a General Tree
+        A General Tree allows each node 
+        to have any number of children. 
+        Here's a list of common operations performed on it:
+
+        | Operation            | Time Complexity     | Purpose                                                                     |
+        | -------------------- | ------------------- | --------------------------------------------------------------------------- |
+        | Traversal            | O(n)                | Visit all nodes (DFS or BFS) to process or display tree contents.           |
+        | Search               | O(n)                | Find a node with a specific value.                                          |
+        | Insertion            | O(1) to O(n)        | Add a new child to a given parent node. (O(1) if parent reference is known) |
+        | Deletion             | O(n)                | Remove a node and all its descendants (subtree deletion).                   |
+        | Height Calculation   | O(n)                | Find the height (max depth) of the tree.                                    |
+        | Find Parent          | O(n)                | Identify the parent of a given node (if no parent pointer exists).          |
+        | Count Nodes / Leaves | O(n)                | Count total or leaf nodes for metrics or validation.                        |
+
+        > Note: `n` is the number of nodes in the tree.
+        > Most operations require traversal 
+          since general trees don’t enforce structure like binary trees do.
+
+// 16/7/25 (day 22 - revision) //
+
+Recursion and Backtracking are 
+    fundamental concepts in problem solving, 
+    especially in algorithms and coding interviews. 
+    Here’s a concise breakdown:
+
+    🧠 Recursion:
+        A function calling itself to solve smaller subproblems.
+    Examples:
+        * Factorial
+        * Fibonacci
+        * Sum of array
+        * Binary Search (recursive)
+        * Tree traversals
+
+    The Tower of Hanoi 
+        is a classic recursion problem 
+        that teaches how recursive thinking 
+        can break down a problem into 
+        simpler subproblems.
+    
+        Recursive Nature
+        To move `n` disks:
+            * Move `n−1` disks from source to helper.
+            * Move the largest disk to destination.
+            * Move `n−1` disks from helper to destination.
+
+Backtracking:
+    A form of recursion 
+    where you explore all possibilities, 
+    but undo ("backtrack") 
+    when a solution path fails.
+    
+    ie "Backtracking is recursion + undo. 
+    You explore choices, and 
+    backtrack when a path doesn’t lead to a solution."
+
+    Steps:
+        1. Choose a solution
+        2. Explore recursively
+        3. Undo the choice (backtrack)
+
+    ✅ Where It Is Used
+        * Problems where we must find:
+            * All possible solutions (e.g., permutations, combinations).
+            * A single valid solution under constraints (e.g., N-Queens).
+            * Optimal solution by pruning (e.g., Sudoku).
+    Classic Problems:
+        * N-Queens
+        * Sudoku Solver
+        * Word Search
+        * Subsets / Combinations / Permutations
+        * Rat in a Maze
+        * Permutations/Combinations
+    
+
+
+        Classification of Backtracking 
+            based on problem types and 
+            the technique used to prune the search space. Here’s a breakdown:
+
+            🧩 1. Combinatorial Backtracking
+                * Involves generating all combinations, permutations, or subsets.
+                * No constraints or only soft rules (like avoiding duplicates).
+
+                ✅ Examples:
+                    * Generating subsets of a set
+                    * All permutations of a string
+                    * Combinations that sum to a target
+
+            🧠 2. Constraint Satisfaction Backtracking
+                * Deals with strong rules (constraints) that must be followed.
+                * Applies pruning and early termination.
+
+                ✅ Examples:
+                    * N-Queens problem (no two queens attack each other)
+                    * Sudoku solver
+                    * Map coloring
+                    * Cryptarithmetic puzzles
+
+            ⚙️ 3. Optimization Backtracking
+                * Tries all valid paths, but among them, returns the optimal (e.g., min/max) result.
+
+                ✅ Examples:
+                    * 0/1 Knapsack problem (when solved via backtracking)
+                    * Longest valid path in a maze
+                    * Maximum number of valid configurations
+
+            🔍 Based on Pruning Techniques:
+                | Type                   | Description                                                               |
+                | ---------------------- | ------------------------------------------------------------------------- |
+                | Naive Backtracking     | Tries all paths, no pruning                                               |
+                | Forward Checking       | Eliminates invalid choices early based on current partial state           |
+                | Constraint Propagation | Applies domain rules (like Sudoku rules) ahead to reduce the search space |
+                | Memoized Backtracking  | Combines backtracking with memoization to avoid re-exploring same states  |
+
+
+    Example: Subsets
+        ```java
+        import java.util.*;
+
+        public class SubsetsGenerator {
+
+            public static List<List<Integer>> subsets(int[] nums) {
+                List<List<Integer>> res = new ArrayList<>();
+                backtrack(nums, 0, new ArrayList<>(), res);
+                return res;
+            }
+
+            private static void backtrack(int[] nums, int index, List<Integer> path, List<List<Integer>> res) {
+                res.add(new ArrayList<>(path)); // Add a copy of current path
+
+                for (int i = index; i < nums.length; i++) {
+                    path.add(nums[i]);                  // Choose
+                    backtrack(nums, i + 1, path, res);  // Explore
+                    path.remove(path.size() - 1);       // Unchoose (backtrack)
+                }
+            }
+
+            public static void main(String[] args) {
+                int[] nums = {1, 2, 3};
+                List<List<Integer>> result = subsets(nums);
+
+                for (List<Integer> subset : result) {
+                    System.out.println(subset);
+                }
+            }
+        }
+        ```
+        State Space Tree for Subsets Example (nums = [1, 2, 3]):
+
+        Each node shows the current subset (path) and the index in the array.
+
+        Level 0: Start
+        []
+        |
+        |-- Include 1
+        |   [1]
+        |   |
+        |   |-- Include 2
+        |   |   [1, 2]
+        |   |   |
+        |   |   |-- Include 3
+        |   |   |   [1, 2, 3]
+        |   |   |
+        |   |   |-- Exclude 3
+        |   |
+        |   |-- Exclude 2
+        |       [1]
+        |       |
+        |       |-- Include 3
+        |           [1, 3]
+        |       |
+        |       |-- Exclude 3
+        |
+        |-- Exclude 1
+            []
+            |
+            |-- Include 2
+            |   [2]
+            |   |
+            |   |-- Include 3
+            |   |   [2, 3]
+            |   |
+            |   |-- Exclude 3
+            |
+            |-- Exclude 2
+                []
+                |
+                |-- Include 3
+                |   [3]
+                |
+                |-- Exclude 3
+
+        All paths (leaf nodes) represent a subset:
+        [[], [1], [1,2], [1,2,3], [1,3], [2], [2,3], [3]]
+------------------------------------------------------------------
+-  A graph is a non-linear data structure 
+   made up of vertices (nodes) and edges (connections). 
+   It is used to represent networks 
+   like social connections, maps, the internet, 
+   dependency structures, and more.
+    🔹 Types of Graphs:
+        * Directed vs Undirected: Edges have direction or not.
+        * Weighted vs Unweighted: Edges may carry weights (e.g., distances, costs).
+        * Cyclic vs Acyclic: May or may not contain cycles.
+        * Connected vs Disconnected: Whether all nodes are reachable from each other.
+        * Simple vs Multigraph: No multiple edges between the same pair vs allowing them.
+
+    🔹 Representation:
+        * Adjacency Matrix: 2D array showing connections.
+        * Adjacency List: List of nodes with their neighbors (space-efficient).
+
+    🔹 Applications:
+        * Shortest path finding (Dijkstra, Bellman-Ford)
+        * Topological sort (DAG)
+        * Network routing
+        * Cycle detection
+        * Social network analysis
+        * Game AI and puzzles
+
+
+----------------------------------
+
+"Find Path in Undirected Graph", 
+"Given an undirected graph and two nodes, determine if there is a path between them using DFS or BFS.", 
+"Easy", 
+"LeetCode, HackerRank, Google"
+
+----------------------------------
+
+Problem Title:
+Find Path in Undirected Graph
+
+Problem Description:
+Given an undirected graph represented as a list of edges and two distinct nodes, determine if there exists a path between the two nodes. You may use either Depth-First Search (DFS) or Breadth-First Search (BFS) to solve this problem.
+
+Input Format:
+- The first line contains two integers n and m, where n is the number of nodes (numbered from 0 to n-1), and m is the number of edges.
+- The next m lines each contain two integers u and v, representing an undirected edge between nodes u and v.
+- The last line contains two integers start and end, representing the nodes between which you need to determine if a path exists.
+
+Output Format:
+- Print "Yes" if there is a path between start and end, otherwise print "No".
+
+Constraints:
+- 2 ≤ n ≤ 10^5
+- 1 ≤ m ≤ 2×10^5
+- 0 ≤ u, v, start, end < n
+- u ≠ v
+- The graph may contain self-loops and multiple edges.
+
+Sample Input:
+5 4
+0 1
+1 2
+2 3
+3 4
+0 4
+
+Sample Output:
+Yes
+
+Explanation:
+There is a path from node 0 to node 4: 0-1-2-3-4.
+
+Difficulty:
+Easy
+
+Five Test Cases:
+Test Case 1:
+Input:
+4 2
+0 1
+2 3
+0 3
+Output:
+No
+
+Test Case 2:
+Input:
+3 3
+0 1
+1 2
+2 0
+0 2
+Output:
+Yes
+
+Test Case 3:
+Input:
+6 5
+0 1
+1 2
+2 3
+3 4
+4 5
+0 5
+Output:
+Yes
+
+Test Case 4:
+Input:
+5 2
+0 1
+3 4
+0 4
+Output:
+No
+
+Test Case 5:
+Input:
+2 1
+0 1
+0 1
+Output:
+Yes
+
+----------------------------------
+
+Java Solution: DFS using recursion
+
+import java.util.*;
+
+public class FindPathInUndirectedGraph {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        List<List<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
+        for (int i = 0; i < m; i++) {
+            int u = sc.nextInt();
+            int v = sc.nextInt();
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        int start = sc.nextInt();
+        int end = sc.nextInt();
+        boolean[] visited = new boolean[n];
+        System.out.println(dfs(adj, visited, start, end) ? "Yes" : "No");
+    }
+
+    private static boolean dfs(List<List<Integer>> adj, boolean[] visited, int curr, int target) {
+        if (curr == target) return true;
+        visited[curr] = true;
+        for (int neighbor : adj.get(curr)) {
+            if (!visited[neighbor]) {
+                if (dfs(adj, visited, neighbor, target)) return true;
+            }
+        }
+        return false;
+    }
+}
+
+---
+
+Java Solution : BFS using queue
+
+import java.util.*;
+
+public class FindPathInUndirectedGraphBFS {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        List<List<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
+        for (int i = 0; i < m; i++) {
+            int u = sc.nextInt();
+            int v = sc.nextInt();
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        int start = sc.nextInt();
+        int end = sc.nextInt();
+        System.out.println(bfs(adj, n, start, end) ? "Yes" : "No");
+    }
+
+    private static boolean bfs(List<List<Integer>> adj, int n, int start, int end) {
+        boolean[] visited = new boolean[n];
+        Queue<Integer> queue = new LinkedList<>();
+        queue.offer(start);
+        visited[start] = true;
+        while (!queue.isEmpty()) {
+            int node = queue.poll(); 
+            if (node == end) return true;
+            for (int neighbor : adj.get(node)) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true; //in the queue after visiting means it is visited
+                    queue.offer(neighbor);
+                }
+            }
+        }
+        return false;
+    }
+}
+
+---
+
+Java Solution: DFS using stack (no recursion)
+
+import java.util.*;
+
+public class FindPathInUndirectedGraphDFSIterative {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        List<List<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
+        for (int i = 0; i < m; i++) {
+            int u = sc.nextInt();
+            int v = sc.nextInt();
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        int start = sc.nextInt();
+        int end = sc.nextInt();
+        System.out.println(dfsIterative(adj, n, start, end) ? "Yes" : "No");
+    }
+
+    private static boolean dfsIterative(List<List<Integer>> adj, int n, int start, int end) {
+        boolean[] visited = new boolean[n];
+        Stack<Integer> stack = new Stack<>();
+        stack.push(start);
+        while (!stack.isEmpty()) {
+            int node = stack.pop(); 
+            if (node == end) return true;
+            if (!visited[node]) {
+                visited[node] = true;
+                for (int neighbor : adj.get(node)) {
+                    if (!visited[neighbor]) {
+                        stack.push(neighbor);  //when we delete the node means it is visited
+                    }
+                }
+            }
+        }
+        return false;
+    }
+}
+----------------------------------------
+Heap Data Structure Notes
+=========================
+    1. Definition:
+        - A heap is a specialized tree-based data structure that satisfies the heap property.
+        - Types: Max Heap (parent >= children), Min Heap (parent <= children).
+
+    2. Properties:
+        - Complete binary tree: All levels are filled except possibly the last, which is filled from left to right.
+        - Heap property: For max heap, every parent node is greater than or equal to its children; for min heap, every parent is less than or equal to its children.
+
+    3. Representation:
+        - Usually implemented as an array.
+        - For node at index i:
+        - Left child: 2*i + 1
+        - Right child: 2*i + 2
+        - Parent: (i - 1) // 2
+
+    4. Operations:
+        - Insertion: Add at the end, then "heapify up" to restore heap property.
+        - Deletion (usually root): Replace root with last element, remove last, then "heapify down".
+        - Peek: Return root element (max or min).
+        - Heapify: Convert an array into a heap.
+
+    5. Time Complexities:
+        - Insertion: O(log n)
+        - Deletion: O(log n)
+        - Peek: O(1)
+        - Heapify: O(n)
+
+    6. Applications:
+        - Priority queues
+        - Heap sort
+        - Graph algorithms (Dijkstra's, Prim's)
+        - Scheduling
+
+    7. Example (Min Heap):
+        Array: [1, 3, 5, 7, 9, 8]
+                 1
+                / \
+               3   5
+              / \  /
+             7  9 8
+
+    8. Heap Sort:
+        - Build a heap from the array.
+        - Repeatedly remove the root and rebuild the heap.
+
+    References:
+    - CLRS: Introduction to Algorithms
+    - https://en.wikipedia.org/wiki/Heap_(data_structure)
+
+
+Priority Queue Notes
+====================
+    1. Definition:
+        - A priority queue is an abstract data type where each element has a priority.
+        - Elements are served based on priority (highest or lowest), not just insertion order.
+
+    2. Implementation:
+        - Commonly implemented using heaps (binary heap, Fibonacci heap).
+        - Can also be implemented with arrays or linked lists (less efficient).
+
+    3. Operations:
+        - Insert: Add an element with a given priority.
+        - Extract (Pop): Remove and return the element with the highest (or lowest) priority.
+        - Peek: Return the element with the highest (or lowest) priority without removing it.
+        - Change Priority: Update the priority of an element (optional, depends on implementation).
+
+    4. Time Complexities (using binary heap):
+        - Insert: O(log n)
+        - Extract: O(log n)
+        - Peek: O(1)
+
+    5. Applications:
+        - Task scheduling
+        - Dijkstra's shortest path algorithm
+        - Huffman coding
+        - Event-driven simulation
+
+    6. Example:
+        - Elements: [(A, 2), (B, 1), (C, 3)]
+        - After inserting: [(C, 3), (A, 2), (B, 1)] (if max-priority queue)
+
+----------------------------------
+
+"Kth Largest Element in an Array", 
+"Find the kth largest element in an unsorted array using a heap.", 
+"Medium", 
+"LeetCode, Facebook, Amazon"
+
+----------------------------------
+
+Problem Title:
+Kth Largest Element in an Array
+
+Problem Description:
+Given an unsorted array of integers and an integer k, find the kth largest element in the array. The kth largest element is the element that would be in the kth position if the array was sorted in descending order. Note that it is the kth largest element in sorted order, not the kth distinct element.
+
+Input Format:
+- The first line contains two integers n and k, where n is the number of elements in the array.
+- The second line contains n space-separated integers representing the elements of the array.
+
+Output Format:
+- Output a single integer, the kth largest element in the array.
+
+Constraints:
+- 1 ≤ n ≤ 10^5
+- 1 ≤ k ≤ n
+- -10^9 ≤ array[i] ≤ 10^9
+
+Sample Input:
+6 2
+3 2 1 5 6 4
+
+Sample Output:
+5
+
+Explanation:
+The sorted array in descending order is [6, 5, 4, 3, 2, 1]. The 2nd largest element is 5.
+
+Difficulty:
+Medium
+
+Test Cases:
+Test Case 1:
+Input:
+5 1
+7 10 4 3 20
+Output:
+20
+
+Test Case 2:
+Input:
+5 3
+7 10 4 3 20
+Output:
+7
+
+Test Case 3:
+Input:
+8 4
+12 35 1 10 34 1 7 8
+Output:
+10
+
+Test Case 4:
+Input:
+3 2
+-1 -2 -3
+Output:
+-2
+
+Test Case 5:
+Input:
+10 5
+5 3 8 6 2 9 1 7 4 10
+Output:
+6
+
+----------------------------------
+
+import java.util.PriorityQueue;
+import java.util.Scanner;
+
+public class KthLargestElement {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int k = sc.nextInt();
+        int[] nums = new int[n];
+        for (int i = 0; i < n; i++) {
+            nums[i] = sc.nextInt();
+        }
+        System.out.println(findKthLargest(nums, k));
+    }
+
+    public static int findKthLargest(int[] nums, int k) {
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>(k);
+        for (int num : nums) {
+            if (minHeap.size() < k) {
+                minHeap.offer(num);
+            } else if (num > minHeap.peek()) {
+                minHeap.poll();
+                minHeap.offer(num);
+            }
+        }
+        return minHeap.peek();
+    } 
+}
+
+----------------------------------
+Hashing, Hashtable, and HashSet - Notes
+
+1. Hashing
+-----------
+- Hashing is a technique to convert a range of key values into a range of indexes of an array.
+- A hash function takes an input (key) and returns an integer (hash code).
+- The hash code is used as an index in a hash table.
+- Good hash functions distribute keys uniformly and minimize collisions.
+
+2. Hashtable
+-------------
+- A Hashtable is a data structure that implements an associative array, mapping keys to values.
+- Uses hashing to compute an index into an array of buckets or slots.
+- On collision (when two keys hash to the same index), uses collision resolution techniques:
+    - Chaining (linked lists at each bucket)
+    - Open addressing (probing for next available slot)
+- Average time complexity for search, insert, delete: O(1)
+- Examples: Java's `Hashtable`, Python's `dict`, C++'s `unordered_map`
+
+3. HashSet
+-----------
+- A HashSet is a collection that contains no duplicate elements.
+- Internally uses a hash table to store elements.
+- Only stores keys (no associated values).
+- Operations: add, remove, contains (all O(1) average time)
+- Examples: Java's `HashSet`, Python's `set`, C++'s `unordered_set`
+
+Summary Table:
+---------------
+| Feature      | Hashtable         | HashSet           |
+|--------------|------------------|-------------------|
+| Stores       | Key-Value pairs  | Unique values     |
+| Duplicates   | Keys unique      | No duplicates     |
+| Lookup time  | O(1) avg         | O(1) avg          |
+| Use case     | Map/dictionary   | Set operations    |
+
+
+--------------------------------------
+
+"Find All Duplicates in an Array", 
+"Given an array of integers, find all elements that appear twice.", 
+"Medium", 
+"LeetCode, Amazon"
+
+----------------------------------
+
+Problem Title:
+Find All Duplicates in an Array
+
+Problem Description:
+Given an array of integers where 1 ≤ a[i] ≤ n (n = size of array), some elements appear twice and others appear once. Find all the elements that appear twice in this array. Return the answer in any order. You must solve the problem without using extra space and in O(n) runtime.
+
+Input Format:
+- The first line contains an integer n, the size of the array.
+- The second line contains n space-separated integers representing the elements of the array.
+
+Output Format:
+- Print the list of integers that appear twice in the array, separated by spaces. If no duplicates are found, print an empty line.
+
+Constraints:
+- 1 ≤ n ≤ 10^5
+- 1 ≤ a[i] ≤ n
+
+Sample Input:
+8
+4 3 2 7 8 2 3 1
+
+Sample Output:
+2 3
+
+Explanation:
+Both 2 and 3 appear twice in the array.
+
+Difficulty:
+Medium
+
+Test Cases:
+Test Case 1:
+Input:
+6
+1 2 3 4 5 6
+Output:
+
+Test Case 2:
+Input:
+5
+1 1 2 2 3
+Output:
+1 2
+
+Test Case 3:
+Input:
+7
+7 3 5 3 7 1 2
+Output:
+7 3
+
+Test Case 4:
+Input:
+4
+4 4 4 4
+Output:
+4
+
+Test Case 5:
+Input:
+10
+10 9 8 7 6 5 4 3 2 1
+Output:(empty line)
+
+--------------------------------------
+
+import java.util.*;
+
+public class FindDuplicates {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int[] nums = new int[n];
+        for(int i = 0; i < n; i++) {
+            nums[i] = sc.nextInt();
+        }
+        List<Integer> res = findDuplicates(nums);
+        for(int i = 0; i < res.size(); i++) {
+            System.out.print(res.get(i));
+            if(i != res.size() - 1) System.out.print(" ");
+        }
+        System.out.println();
+    }
+
+    public static List<Integer> findDuplicates(int[] nums) {
+        List<Integer> result = new ArrayList<>();
+        for(int i = 0; i < nums.length; i++) {
+            int idx = Math.abs(nums[i]) - 1;
+            if(nums[idx] < 0) {
+                result.add(Math.abs(nums[i]));
+            } else {
+                nums[idx] = -nums[idx];
+            }
+        }
+        return result;
+    }
+}
+
+--------------------------------------
