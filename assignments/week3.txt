@@ -36,4 +36,14 @@ non-linear data structures
 heap,queues,trees,graphs
 
 hashtables and hashmaps
-dynamic programming
+
+dynamic programming 
+....Guarantees an optimal solution if the problem exhibits the principle of optimality.
+....May involve backtracking
+...Reuses solutions to overlapping subproblems.
+Some popular problems solved using Dynamic Programming are Fibonacci Numbers, Diff Utility (Longest Common Subsequence), Bellman–Ford Shortest Path, Floyd Warshall, Edit Distance and Matrix Chain Multiplication.
+
+ greedy programming
+ ...no backtracking
+ ...May not always provide an optimal solution.
+ Examples of popular algorithms where Greedy gives the best solution are Fractional Knapsack, Dijkstra's algorithm, Kruskal's algorithm, Huffman coding and Prim's Algorithm
